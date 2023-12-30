@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './Components/Pages/Login/Login';
+import Home from './Components/Pages/Home/Home';
+import EmployeeMasterCompoenet from './Components/EmployeeMasterCompoenet';
+import SalaryComponent from './Components/Salary/SalaryComponent';
+import UserCreationCompoenent from './Components/UserCreationCompoenent';
+import EmployeeMasterUtility from "./Components/EmployeeMasterUtility"
+import UserCreationUtility from "./Components/UserCreationUtility"
+import SalaryUtility from "./Components/Salary/SalaryUtility"
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div>
+        <Routes>
+        <Route path="/"  element={<Login/>} /> 
+          <Route path="/home" element={<Home/>} />
+          <Route path="/employeemaster"  element={<EmployeeMasterCompoenet/>} /> 
+          <Route path="/employeemasterutility"  element={<EmployeeMasterUtility/>} /> 
+          <Route path="/salary_genarate"  element={<SalaryComponent/>} /> 
+          <Route path="/salary_genarate_utility"  element={<SalaryUtility/>} /> 
+          <Route path="/user_Creation"  element={<UserCreationCompoenent/>} /> 
+          <Route path="/user_Creation_utility"  element={<UserCreationUtility/>} /> 
+        </Routes>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
+

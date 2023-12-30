@@ -1,38 +1,183 @@
+.button_container{
+  margin-right: 100px;
+}
+
+/* popup css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .App {
-  text-align: center;
+  display:block;
+  flex-direction: row;
+  align-items: center;
+  padding: 30px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.controls {
+  margin-bottom: 10px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.post-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.post-table th,
+.post-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.row-item:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+}
+
+.row-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+
+.row-item:hover {
+  background-color: #f0f0f0; 
+}
+
+.row-item.active {
+  background-color: #d3d3d3;
+}
+
+
+/* select box style */
+/* CSS to style the form components and arrange them in a row */
+
+.row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+}
+
+
+
+.form-labels {
+  font-weight: bold;
+  color: blue;
+  display: flex;
+  margin-bottom: 5px;
+}
+.form-select {
+  width: 100%; 
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+} 
+
+
+
+#data-grid-demo {
+  min-height: 700px;
+}
+
+
+.marked-for-deletion {
+  background-color: red;
+ 
+}
+
+.full-screen-modal {
+  display: flex !important;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  overflow: auto;
 }
 
-.App-link {
-  color: #61dafb;
+.selected-row {
+  background-color: orange; 
 }
 
-@keyframes App-logo-spin {
+
+/* Add this CSS to your stylesheet */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.custom-table th, .custom-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.custom-table th {
+  background-color: #f0f0f0;
+}
+
+.custom-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+
+.redBackground {
+  background-color: red;
+}
+
+
+
+/* Add this to your styles or CSS file */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  z-index: 1000;
+  border: 1px solid #ddd;
+}
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.popup button {
+  margin-top: 10px;
+}
+
+
+
+.table.disabled {
+  pointer-events: none; /* Disable interactions */
+  opacity: 0.5; /* Apply a visual indication of being disabled */
+}
+
+
+.custom-heading {
+  color: #3498db; /* Set the text color to a specific color */
+  font-size: 2.5rem; /* Adjust the font size */
+  font-weight: bold; /* Make the text bold */
+  text-transform: uppercase; /* Convert text to uppercase */
+  letter-spacing: 2px; /* Add spacing between letters */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Add a subtle text shadow */
+  opacity: 0; /* Set initial opacity to 0 for the fade-in effect */
+  animation: fadeIn 1.5s ease-out forwards; /* Animation definition */
+}
+
+/* Keyframes for the fadeIn animation */
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(-20px); /* Optional: Initial position */
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0); /* Optional: Final position */
   }
 }
+
