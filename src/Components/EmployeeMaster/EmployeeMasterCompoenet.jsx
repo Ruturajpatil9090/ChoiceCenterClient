@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "../App.css";
+import "../../App.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
@@ -23,34 +23,6 @@ const EmployeeMasterComponent = () => {
   const [highlightedButton, setHighlightedButton] = useState(null);
   const [cancelButtonClicked, setCancelButtonClicked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  // const navigate = useNavigate();
-
-  // const handleAddOne = () => {
-  //   setAddOneButtonEnabled(false);
-  //   setSaveButtonEnabled(true);
-  //   setCancelButtonEnabled(true);
-  //   setEditButtonEnabled(false);
-  //   setDeleteButtonEnabled(false);
-  //   setIsEditMode(false);
-  //   if (resaleMillDropdownRef.current) {
-  //     resaleMillDropdownRef.current.focus();
-  //   }
-  //   if (lastEmployeeCode !== "") {
-  //     // Update the Employee_Code with the next available code
-  //     const nextEmployeeCode = lastEmployeeCode + 1;
-  //     setEmployeeDetails((prevState) => ({
-  //       ...prevState,
-  //       Employee_Code: nextEmployeeCode,
-  //       Employee_Name: "",
-  //       Basic_Salary: "",
-  //       Rate_Per_Hour: "",
-  //       Date_Of_Joining: getCurrentDate(),
-  //       Resigned: "N",
-  //     }));
-  //   }
-  //   // window.location.reload();
-  // };
 
   const handleAddOne = () => {
     // Disable and enable buttons as needed
@@ -394,7 +366,7 @@ const EmployeeMasterComponent = () => {
       setCancelButtonEnabled(false);
       setCancelButtonClicked(true);
     } else {
-      // getData();
+      handleAddOne();
     }
   }, [editRecordData]);
 

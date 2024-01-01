@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './Components/Pages/Login/Login';
 import Home from './Components/Pages/Home/Home';
-import EmployeeMasterCompoenet from './Components/EmployeeMasterCompoenet';
+import EmployeeMasterCompoenet from './Components/EmployeeMaster/EmployeeMasterCompoenet';
 import SalaryComponent from './Components/Salary/SalaryComponent';
-import UserCreationCompoenent from './Components/UserCreationCompoenent';
-import EmployeeMasterUtility from "./Components/EmployeeMasterUtility"
-import UserCreationUtility from "./Components/UserCreationUtility"
+import UserCreationCompoenent from './Components/UserCreation/UserCreationCompoenent';
+import EmployeeMasterUtility from "./Components/EmployeeMaster/EmployeeMasterUtility"
+import UserCreationUtility from "./Components/UserCreation/UserCreationUtility"
 import SalaryUtility from "./Components/Salary/SalaryUtility"
 
 const App = () => {

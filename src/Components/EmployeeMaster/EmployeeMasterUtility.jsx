@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 
-function TenderPurchaseUtility() {
+function EmployeeMasterUtility() {
   const [fetchedData, setFetchedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -163,4 +163,4 @@ function TenderPurchaseUtility() {
   );
 }
 
-export default TenderPurchaseUtility;
+export default EmployeeMasterUtility;

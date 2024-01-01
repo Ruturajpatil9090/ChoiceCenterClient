@@ -5,8 +5,6 @@ import { IoIosPersonAdd } from "react-icons/io";
 import { RiLockPasswordFill } from "react-icons/ri";
 import "../../../App.css";
 
-
-
 const Login = () => {
   const [formData, setFormData] = useState({
     username: '',

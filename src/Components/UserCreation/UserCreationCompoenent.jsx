@@ -1,11 +1,10 @@
-import React, { useState,useRef,useEffect} from "react";
-import { useNavigate,useLocation } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
-var employeeCodeNew=''
+var employeeCodeNew = "";
 
-const Text1 = () => {
- 
+const UserCreationCompoenent = () => {
   const addNewButtonRef = useRef(null);
   const resaleMillDropdownRef = useRef(null);
   const updateButtonRef = useRef(null);
@@ -27,16 +26,16 @@ const Text1 = () => {
   const [users, setUsers] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
-  const [name, setName] = useState(""); 
+  const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
   const [deleteMode, setDeleteMode] = useState(false);
-  const [selectedMillCode, setSelectedMillCode] = useState(""); 
-  
-  const [editedrecord,setEditedrecord] = useState("")
+  const [selectedMillCode, setSelectedMillCode] = useState("");
 
-  const [isEditing,setIsEditing] = useState(false)
+  const [editedrecord, setEditedrecord] = useState("");
 
-  const [lastEmployeeCode, setLastEmployeeCode] = useState(""); 
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [lastEmployeeCode, setLastEmployeeCode] = useState("");
   const [employeeDetails, setEmployeeDetails] = useState({
     employeeCode: "",
     userName: "",
@@ -47,7 +46,6 @@ const Text1 = () => {
   });
   const navigate = useNavigate();
 
-  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEmployeeDetails({
@@ -55,7 +53,9 @@ const Text1 = () => {
       [name]: value,
     });
   };
+
   
+
   const handleAddOne = () => {
     // Disable and enable buttons as needed
     setAddOneButtonEnabled(false);
@@ -64,23 +64,23 @@ const Text1 = () => {
     setEditButtonEnabled(false);
     setDeleteButtonEnabled(false);
     setIsEditMode(false);
-    setIsEditing(true)
-  
+    setIsEditing(true);
+
     // Focus on the dropdown if it exists
     if (resaleMillDropdownRef.current) {
       resaleMillDropdownRef.current.focus();
     }
-  
+
     // Fetch the last employee code from the API
     axios
       .get("http://localhost:5000/api/employees/lastusercode")
       .then((response) => {
         // Assuming the API response contains the last employee code
         const lastEmployeeCode = response.data.lastUserCreation;
-  
+
         // Set the last employee code to the employeeDetails
         setEmployeeDetails({
-          employeeCode: lastEmployeeCode +1,
+          employeeCode: lastEmployeeCode + 1,
           userName: "",
           mobileNo: "",
           emailId: "",
@@ -92,10 +92,9 @@ const Text1 = () => {
         console.error("Error fetching last employee code:", error);
       });
   };
-  
 
   const handleEdit = () => {
-    setIsEditing(true)
+    setIsEditing(true);
     setIsEditMode(true);
     setAddOneButtonEnabled(false);
     setSaveButtonEnabled(true);
@@ -106,16 +105,17 @@ const Text1 = () => {
     if (resaleMillDropdownRef.current) {
       resaleMillDropdownRef.current.focus();
     }
-    employeeCodeNew=employeeDetails.employeeCode
+    employeeCodeNew = employeeDetails.employeeCode;
   };
 
   const handleSaveOrUpdate = () => {
     if (isEditMode) {
       // Update existing user
       axios
-        .put(`http://localhost:5000/api/employees/updateuser/${employeeCodeNew}`,employeeDetails 
-    
-      )
+        .put(
+          `http://localhost:5000/api/employees/updateuser/${employeeCodeNew}`,
+          employeeDetails
+        )
         .then((response) => {
           console.log("Data updated successfully:", response.data);
           setIsEditMode(false);
@@ -126,7 +126,7 @@ const Text1 = () => {
           setSaveButtonEnabled(false);
           setCancelButtonEnabled(false);
           setUpdateButtonClicked(true);
-          setIsEditing(false)
+          setIsEditing(false);
         })
         .catch((error) => {
           console.error("Error updating data:", error);
@@ -134,7 +134,10 @@ const Text1 = () => {
     } else {
       // Insert new user
       axios
-        .post("http://localhost:5000/api/employees/insertnewuser",employeeDetails)
+        .post(
+          "http://localhost:5000/api/employees/insertnewuser",
+          employeeDetails
+        )
         .then((response) => {
           console.log("Data saved successfully:", response.data);
           window.alert("Data saved successfully!");
@@ -147,22 +150,18 @@ const Text1 = () => {
           setCancelButtonEnabled(false);
           addNewButtonRef.current.focus();
           setSaveButtonClicked(true);
-          setIsEditing(true)
-
+          setIsEditing(true);
         })
         .catch((error) => {
           console.error("Error saving data:", error);
         });
     }
   };
-  
-  
 
   const handleBack = () => {
     navigate("/user_Creation_utility");
   };
 
- 
   const handleDelete = () => {
     console.log("Deleted");
     setIsEditMode(false);
@@ -173,7 +172,9 @@ const Text1 = () => {
     setSaveButtonEnabled(false);
     setCancelButtonEnabled(false);
     axios
-      .delete(`http://localhost:5000/api/employees/deleteuser/${employeeCodeNew}`)
+      .delete(
+        `http://localhost:5000/api/employees/deleteuser/${employeeCodeNew}`
+      )
       .then((response) => {
         console.log("User deleted successfully:", response.data);
         // Reset the form after successful deletion
@@ -200,16 +201,16 @@ const Text1 = () => {
     setSaveButtonEnabled(false);
     setCancelButtonEnabled(false);
     setCancelButtonClicked(true);
-    setIsEditing(false)
+    setIsEditing(false);
     // Use Axios to make a GET request to fetch the last record
     axios
       .get("http://localhost:5000/api/employees/getlastrecordbyuserid")
       .then((response) => {
         // Assuming the response contains the last record data
         const lastRecord = response.data.lastUserCreation;
-        employeeCodeNew = response.data.lastUserCreation.employeeCode
-        console.log("++++",lastRecord)
-  
+        employeeCodeNew = response.data.lastUserCreation.employeeCode;
+        console.log("++++", lastRecord);
+
         // Set the values from the last record to the state
         setEmployeeDetails({
           employeeCode: lastRecord.employeeCode,
@@ -224,11 +225,6 @@ const Text1 = () => {
         console.error("Error fetching last record:", error);
       });
   };
-
-
-
-
-
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -248,15 +244,13 @@ const Text1 = () => {
     }
   };
 
-
   const location = useLocation();
   const editRecordData = location.state && location.state.editRecordData;
-
 
   useEffect(() => {
     if (editRecordData) {
       setEmployeeDetails({
-        ...editRecordData,  
+        ...editRecordData,
       });
       setAddOneButtonEnabled(true);
       setEditButtonEnabled(true);
@@ -266,22 +260,23 @@ const Text1 = () => {
       setCancelButtonEnabled(false);
       setCancelButtonClicked(true);
     } else {
-      // getData();
+      handleAddOne();
     }
   }, [editRecordData]);
 
-
   return (
     <>
-      <div > 
-      <h3 className="mt-4 mb-4 text-center custom-heading">New User Creation</h3>
-      <div
+      <div>
+        <h3 className="mt-4 mb-4 text-center custom-heading">
+          New User Creation
+        </h3>
+        <div
           style={{
             marginTop: "30px",
             marginBottom: "10px",
             display: "flex",
             gap: "10px",
-            marginLeft:"600px"
+            marginLeft: "600px",
           }}
         >
           <button
@@ -399,13 +394,8 @@ const Text1 = () => {
           >
             Back
           </button>
-
         </div>
-        
       </div>
-
-
-    
 
       <div
         style={{
@@ -429,7 +419,6 @@ const Text1 = () => {
                   onChange={handleInputChange}
                   autoComplete="off"
                   disabled
-               
                 />
               </div>
             </div>
@@ -475,7 +464,6 @@ const Text1 = () => {
                   onChange={handleInputChange}
                   autoComplete="off"
                   disabled={!isEditing}
-               
                 />
               </div>
             </div>
@@ -512,14 +500,11 @@ const Text1 = () => {
               </div>
             </div>
 
-            <div>
-           
-            </div>
+            <div></div>
           </form>
         </div>
       </div>
-     
     </>
   );
 };
-export default Text1;  
+export default UserCreationCompoenent;

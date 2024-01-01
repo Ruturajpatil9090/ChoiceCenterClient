@@ -1241,6 +1241,7 @@ const SalaryComponent = () => {
               isCancelButtonClicked ? DaysInMonthNew : salaryDetails.daysInMonth
             }
             onChange={handleInputChange}
+            disabled={isCancelButtonClicked && !isaddButtonClicked }
        
           />
         </div>
