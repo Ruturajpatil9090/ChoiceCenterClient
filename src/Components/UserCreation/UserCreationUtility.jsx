@@ -2,7 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 
+
 function UserCreationUtility() {
+  const apiURL = process.env.REACT_APP_API_URL
+
   const [fetchedData, setFetchedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -11,10 +14,12 @@ function UserCreationUtility() {
   const [filterValue, setFilterValue] = useState("");
   const navigate = useNavigate();
 
+  
   useEffect(() => {
     const fetchData = async () => {
+   
       try {
-        const apiUrl = 'http://localhost:5000/api/employees/getallusers';
+        const apiUrl = `${apiURL}/api/employees/getallusers`;
         const response = await fetch(apiUrl);
         const data = await response.json();
         console.log("data is",data)

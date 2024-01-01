@@ -5,8 +5,8 @@ import axios from "axios";
 
 var lastemployeeCode = "";
 const EmployeeMasterComponent = () => {
+  const apiURL = process.env.REACT_APP_API_URL;
   const [lastEmployeeCode, setLastEmployeeCode] = useState("");
-
   const addNewButtonRef = useRef(null);
   const resaleMillDropdownRef = useRef(null);
   const updateButtonRef = useRef(null);
@@ -41,7 +41,7 @@ const EmployeeMasterComponent = () => {
 
     // Fetch the last employee code from the API
     axios
-      .get("http://localhost:5000/api/employees/getlastemployee")
+      .get(`${apiURL}/api/employees/getlastemployee`)
       .then((response) => {
         // Assuming the API response contains the last employee code
         const lastEmployeeCode = response.data.lastEmployee;
@@ -95,7 +95,7 @@ const EmployeeMasterComponent = () => {
       // Send the employee details to the backend API for update
       axios
         .put(
-          `http://localhost:5000/api/employees/updateemployee?Employee_Code=${employeeDetails.Employee_Code}`,
+          `${apiURL}/api/employees/updateemployee?Employee_Code=${employeeDetails.Employee_Code}`,
           employeeToUpdate
         )
         .then((response) => {
@@ -130,7 +130,7 @@ const EmployeeMasterComponent = () => {
 
       // Send the employee details to the backend API for insertion
       axios
-        .post("http://localhost:5000/api/employees/insert", employeeToSave)
+        .post(`${apiURL}/api/employees/insert`, employeeToSave)
         .then((response) => {
           // console.log("Employee saved:", response.data);
           window.alert("Data saved successfully!");
@@ -161,7 +161,7 @@ const EmployeeMasterComponent = () => {
 
       axios
         .delete(
-          `http://localhost:5000/api/employees/deleteemployee/${employeeDetails.Employee_Code}`
+          `${apiURL}/api/employees/deleteemployee/${employeeDetails.Employee_Code}`
         )
         .then((response) => {
           console.log("Employee deleted:", response.data);
@@ -200,7 +200,7 @@ const EmployeeMasterComponent = () => {
 
     // Use Axios to make a GET request to fetch the last record
     axios
-      .get("http://localhost:5000/api/employees/getlastEmployeeAll")
+      .get(`${apiURL}/api/employees/getlastEmployeeAll`)
       .then((response) => {
         // Assuming the response contains the last record data
         const lastRecord = response.data.lastUserCreation;
@@ -246,7 +246,7 @@ const EmployeeMasterComponent = () => {
 
   const getData = () => {
     axios
-      .get("http://localhost:5000/api/employees/lastemployee")
+      .get(`${apiURL}/api/employees/lastemployee`)
       .then((response) => {
         const newCode = response.data.lastEmployee;
         setLastEmployeeCode(newCode);
@@ -264,7 +264,7 @@ const EmployeeMasterComponent = () => {
 
   const getDatalast = () => {
     axios
-      .get("http://localhost:5000/api/employees/lastemployee")
+      .get(`${apiURL}/api/employees/lastemployee`)
       .then((response) => {
         const newCode = response.data.lastEmployee;
         setLastEmployeeCode(newCode);

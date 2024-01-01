@@ -8,6 +8,7 @@ import "../../App.css";
 var lActiveInputFeild = "";
 
 const ApiDataTableModal = ({ onAcCodeClick, name, millData,userIdNew,newSetEmployeeName,isCancelButtonClickeded}) => {
+  const apiURL = process.env.REACT_APP_API_URL;
   const [showModal, setShowModal] = useState(false);
   const [popupContent, setPopupContent] = useState([]);
   const [enteredAcCode, setEnteredAcCode] = useState("");
@@ -22,7 +23,7 @@ const ApiDataTableModal = ({ onAcCodeClick, name, millData,userIdNew,newSetEmplo
   // Fetch data based on API
   const fetchAndOpenPopup = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/employees/`);
+      const response = await axios.get(`${apiURL}/api/employees/`);
       const data = response.data;
       setPopupContent(data);
       setShowModal(true);

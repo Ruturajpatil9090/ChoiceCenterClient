@@ -6,6 +6,7 @@ import { BsFillPrinterFill } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 
 function TenderPurchaseUtility() {
+  const apiURL = process.env.REACT_APP_API_URL;
   const [fetchedData, setFetchedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -17,7 +18,7 @@ function TenderPurchaseUtility() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = "http://localhost:5000/api/employees/getAllUtility";
+        const apiUrl = `${apiURL}/api/employees/getAllUtility`;
         const response = await fetch(apiUrl);
         const data = await response.json();
         console.log("data is", data);

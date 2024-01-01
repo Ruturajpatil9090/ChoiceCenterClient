@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
+
 var employeeCodeNew = "";
 
 const UserCreationCompoenent = () => {
+  const apiURL = process.env.REACT_APP_API_URL;
   const addNewButtonRef = useRef(null);
   const resaleMillDropdownRef = useRef(null);
   const updateButtonRef = useRef(null);
@@ -73,7 +75,7 @@ const UserCreationCompoenent = () => {
 
     // Fetch the last employee code from the API
     axios
-      .get("http://localhost:5000/api/employees/lastusercode")
+      .get(`${apiURL}/api/employees/lastusercode`)
       .then((response) => {
         // Assuming the API response contains the last employee code
         const lastEmployeeCode = response.data.lastUserCreation;
@@ -113,7 +115,7 @@ const UserCreationCompoenent = () => {
       // Update existing user
       axios
         .put(
-          `http://localhost:5000/api/employees/updateuser/${employeeCodeNew}`,
+          `${apiURL}/api/employees/updateuser/${employeeCodeNew}`,
           employeeDetails
         )
         .then((response) => {
@@ -135,7 +137,7 @@ const UserCreationCompoenent = () => {
       // Insert new user
       axios
         .post(
-          "http://localhost:5000/api/employees/insertnewuser",
+          `${apiURL}/api/employees/insertnewuser`,
           employeeDetails
         )
         .then((response) => {
@@ -173,7 +175,7 @@ const UserCreationCompoenent = () => {
     setCancelButtonEnabled(false);
     axios
       .delete(
-        `http://localhost:5000/api/employees/deleteuser/${employeeCodeNew}`
+        `${apiURL}/api/employees/deleteuser/${employeeCodeNew}`
       )
       .then((response) => {
         console.log("User deleted successfully:", response.data);
@@ -204,7 +206,7 @@ const UserCreationCompoenent = () => {
     setIsEditing(false);
     // Use Axios to make a GET request to fetch the last record
     axios
-      .get("http://localhost:5000/api/employees/getlastrecordbyuserid")
+      .get(`${apiURL}/api/employees/getlastrecordbyuserid`)
       .then((response) => {
         // Assuming the response contains the last record data
         const lastRecord = response.data.lastUserCreation;

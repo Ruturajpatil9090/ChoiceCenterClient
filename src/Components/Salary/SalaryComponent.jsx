@@ -25,6 +25,7 @@ var typeEmpoyeeHours = ""
 
 
 const SalaryComponent = () => {
+  const apiURL = process.env.REACT_APP_API_URL;
   //Button Enabled and Disabled Functionality state
   const addNewButtonRef = useRef(null);
   const resaleMillDropdownRef = useRef(null);
@@ -153,7 +154,7 @@ const SalaryComponent = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
+        `${apiURL}/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
       );
 
       if (response.status === 200) {
@@ -369,7 +370,7 @@ const SalaryComponent = () => {
     debugger;
     try {
       const apiResponse = await axios.get(
-        `http://localhost:5000/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
+        `${apiURL}/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
       );
       const apiData = apiResponse.data.lastRecord;
       // console.log(apiData);
@@ -493,7 +494,7 @@ const SalaryComponent = () => {
     if (selectedUserId) {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/data/getTableData/${year}/${month}?UserId=${selectedUserId}`
+          `${apiURL}/api/data/getTableData/${year}/${month}?UserId=${selectedUserId}`
         );
 
         if (response.ok) {
@@ -857,7 +858,7 @@ const SalaryComponent = () => {
   const saveDataToDatabase = async (jsonData) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/employees/insertjsondata",
+        `${apiURL}/api/employees/insertjsondata`,
         jsonData,
         {
           headers: {
@@ -947,7 +948,7 @@ const SalaryComponent = () => {
   
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/employees/updatesalary?salary_no=${salaryDetails.salaryNo}`,
+        `${apiURL}/api/employees/updatesalary?salary_no=${salaryDetails.salaryNo}`,
         { updateData: jsonData },
         {
           headers: {
@@ -976,7 +977,7 @@ const SalaryComponent = () => {
   const fetchLastSalaryNo = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/employees/getlastsalaryno"
+        `${apiURL}/api/employees/getlastsalaryno`
       );
       if (response.status === 200) {
         const lastSalaryNo = response.data.lastRecord
@@ -1021,7 +1022,7 @@ const SalaryComponent = () => {
    
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
+        `${apiURL}/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
       );
       setIsCancelButtonClicked(true);
       setIsEditMode(false);
@@ -1038,25 +1039,17 @@ const SalaryComponent = () => {
         const lastRecordData = response.data.lastRecord;
         newSetSelectedUserId = lastRecordData[0].userId;
         newSetEmployeeName = lastRecordData[0].Employee_name;
-        // console.log("lastRecordData", newSetEmployeeName);
-        // console.log("lastRecordData", lastRecordData[0].salaryDate);
         DaysInMonthNew = lastRecordData[0].daysInMonth;
         newNetRatePerHour = lastRecordData[0].netRatePerHour;
         newBasicSalry = lastRecordData[0].Basic_salary;
 
         newSalaryDate = lastRecordData[0].salaryDate;
-        // console.log("DDDDDDDDDDDDD", newSalaryDate);
-
+       
         // Update the salary details state
         setSalaryDetails({
           salaryNo: lastRecordData[0].salary_no,
           daysInMonth: DaysInMonthNew,
-
-          // Add other properties as needed
         });
-
-        // setSelectedUserId(lastRecordData[0].userId)
-        // setSelectedEmployeeName(lastRecordData[0].Employee_name)
 
         // Update other relevant state variables based on the first record in lastRecordData
         setTotalHours(lastRecordData[0].totalMonthyHours);

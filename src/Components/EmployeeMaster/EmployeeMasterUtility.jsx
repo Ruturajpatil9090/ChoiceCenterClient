@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 
 function EmployeeMasterUtility() {
+  const apiURL = process.env.REACT_APP_API_URL;
   const [fetchedData, setFetchedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [perPage, setPerPage] = useState(10);
@@ -14,10 +15,9 @@ function EmployeeMasterUtility() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = "http://localhost:5000/api/employees/";
+        const apiUrl = `${apiURL}/api/employees/`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        // console.log("data is", data);
         setFetchedData(data);
       } catch (error) {
         console.error("Error fetching data:", error);
