@@ -25,6 +25,7 @@ const ApiDataTableModal = ({ onAcCodeClick, name, millData,userIdNew,newSetEmplo
     try {
       const response = await axios.get(`${apiURL}/api/employees/`);
       const data = response.data;
+      console.log("data",data)
       setPopupContent(data);
       setShowModal(true);
     } catch (error) {
@@ -89,7 +90,8 @@ const ApiDataTableModal = ({ onAcCodeClick, name, millData,userIdNew,newSetEmplo
             matchingItem.Employee_Code,
             matchingItem.Employee_Name,
             matchingItem.Rate_Per_Hour,
-            matchingItem.Basic_Salary
+            matchingItem.Basic_Salary,
+            matchingItem.From_Time
           );
         }
       } else {
@@ -109,7 +111,7 @@ const handleRecordDoubleClick = (item) => {
     setEnteredAcCode(item.Employee_Code);
     setEnteredAcName(item.Employee_Name);
     if (onAcCodeClick) {
-      onAcCodeClick(item.Employee_Code, item.Employee_Name, item.Rate_Per_Hour, item.Basic_Salary);
+      onAcCodeClick(item.Employee_Code, item.Employee_Name, item.Rate_Per_Hour, item.Basic_Salary,item.From_Time);
     }
   }
   setShowModal(false);
@@ -147,6 +149,7 @@ const handleRecordDoubleClick = (item) => {
       Rate_Per_Hour: matchingItem.Rate_Per_Hour,
       Date_Of_Joining: matchingItem.Date_Of_Joining,
       Resigned: matchingItem.Resigned,
+      From_Time: matchingItem.From_Time,
     };
   });
 
@@ -248,6 +251,7 @@ useEffect(() => {
                     <th>Rate_Per_Hour</th>
                     <th>Date_Of_Joining</th>
                     <th>Resigned</th>
+                    <th>From Time</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -265,6 +269,7 @@ useEffect(() => {
                       <td>{item.Rate_Per_Hour}</td>
                       <td>{item.Date_Of_Joining}</td>
                       <td>{item.Resigned}</td>
+                      <td>{item.From_Time}</td>
                     </tr>
                   ))}
                 </tbody>

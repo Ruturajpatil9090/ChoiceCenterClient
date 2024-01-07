@@ -2,9 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import "../../App.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 var lastemployeeCode = "";
+var From_Time = "";
+var To_Time = "";
+
 const EmployeeMasterComponent = () => {
+  console.log("from time values", From_Time, To_Time);
   const apiURL = process.env.REACT_APP_API_URL;
   const [lastEmployeeCode, setLastEmployeeCode] = useState("");
   const addNewButtonRef = useRef(null);
@@ -23,6 +29,10 @@ const EmployeeMasterComponent = () => {
   const [highlightedButton, setHighlightedButton] = useState(null);
   const [cancelButtonClicked, setCancelButtonClicked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+
+  const [fromTime, setFromTime] = useState(new Date());  // Provide a default value
+const [toTime, setToTime] = useState(new Date());  // Provide a default value
+
 
   const handleAddOne = () => {
     // Disable and enable buttons as needed
@@ -45,8 +55,6 @@ const EmployeeMasterComponent = () => {
       .then((response) => {
         // Assuming the API response contains the last employee code
         const lastEmployeeCode = response.data.lastEmployee;
-        // console.log("+++", lastEmployeeCode);
-
         // Set the last employee code to the employeeDetails
         setEmployeeDetails((prevState) => ({
           ...prevState,
@@ -90,6 +98,12 @@ const EmployeeMasterComponent = () => {
       const employeeToUpdate = {
         ...employeeDetails,
         Date_Of_Joining: formattedDate,
+        From_Time: fromTime
+        ? fromTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        : null,
+      To_Time: toTime
+        ? toTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        : null,
       };
 
       // Send the employee details to the backend API for update
@@ -126,6 +140,12 @@ const EmployeeMasterComponent = () => {
       const employeeToSave = {
         ...employeeDetails,
         Date_Of_Joining: formattedDate,
+        From_Time: fromTime
+        ? fromTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        : null,
+      To_Time: toTime
+        ? toTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        : null,
       };
 
       // Send the employee details to the backend API for insertion
@@ -142,7 +162,6 @@ const EmployeeMasterComponent = () => {
             Date_Of_Joining: getCurrentDate(),
             Resigned: "",
           });
-          //window.location.reload();
         })
         .catch((error) => {
           console.error("Error saving employee:", error);
@@ -204,8 +223,7 @@ const EmployeeMasterComponent = () => {
       .then((response) => {
         // Assuming the response contains the last record data
         const lastRecord = response.data.lastUserCreation;
-        // console.log("++++", lastRecord);
-
+      
         // Set the values from the last record to the state
         setEmployeeDetails({
           Employee_Code: lastRecord.Employee_Code,
@@ -215,6 +233,10 @@ const EmployeeMasterComponent = () => {
           Date_Of_Joining: lastRecord.Date_Of_Joining,
           Resigned: lastRecord.Resigned,
         });
+        setFromTime(lastRecord.From_Time ? new Date(`2024-01-01 ${lastRecord.From_Time}`) : null);
+        setToTime(lastRecord.To_Time ? new Date(`2024-01-01 ${lastRecord.To_Time}`) : null);
+        
+
       })
       .catch((error) => {
         console.error("Error fetching last record:", error);
@@ -308,7 +330,7 @@ const EmployeeMasterComponent = () => {
           console.error(
             "Invalid Rate Per Hour value. Please enter a valid float."
           );
-          // Clear the field when an invalid value is entered
+
           setEmployeeDetails({
             ...employeeDetails,
             [name]: "",
@@ -317,13 +339,7 @@ const EmployeeMasterComponent = () => {
         }
         break;
 
-      // Add additional validation for other fields as needed
-      // case "Another_Field_Name":
-      //   // Validation logic for another field
-      //   break;
-
       default:
-        // Handle other fields without specific validation
         break;
     }
 
@@ -334,8 +350,23 @@ const EmployeeMasterComponent = () => {
     });
   };
 
+  const handleFromTimeChange = (time) => {
+    console.log("time is",time)
+    setFromTime(time);
+ 
+  };
+
+  const handleToTimeChange = (time) => {
+    setToTime(time);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log("Employee details submitted:", {
+      ...employeeDetails,
+      From_Time: fromTime ? fromTime.toLocaleTimeString("en-US", { hour12: false }) : null,
+      To_Time: toTime ? toTime.toLocaleTimeString() : null,
+    });
   };
 
   function getCurrentDate() {
@@ -353,11 +384,18 @@ const EmployeeMasterComponent = () => {
   const location = useLocation();
   const editRecordData = location.state && location.state.editRecordData;
 
+
+  console.log("editRecordData",editRecordData)
+
+  
+
   useEffect(() => {
     if (editRecordData) {
       setEmployeeDetails({
         ...editRecordData,
       });
+      setFromTime(editRecordData.From_Time ? new Date(`2024-01-01 ${editRecordData.From_Time}`) : null);
+      setToTime(editRecordData.To_Time ? new Date(`2024-01-01 ${editRecordData.To_Time}`) : null);
       setAddOneButtonEnabled(true);
       setEditButtonEnabled(true);
       setDeleteButtonEnabled(true);
@@ -373,7 +411,9 @@ const EmployeeMasterComponent = () => {
   return (
     <>
       <div>
-      <h3 className="mt-4 mb-4 text-center custom-heading">Employee Master Detail</h3>
+        <h3 className="mt-4 mb-4 text-center custom-heading">
+          Employee Master Detail
+        </h3>
         <div
           style={{
             marginTop: "30px",
@@ -500,8 +540,9 @@ const EmployeeMasterComponent = () => {
           </button>
         </div>
       </div>
-
-    
+      <br></br>
+      <br></br>
+      <br></br>
 
       <div
         style={{
@@ -576,6 +617,40 @@ const EmployeeMasterComponent = () => {
             </div>
 
             <div className="row mb-3">
+              <label className="form-label col-md-2">From Time:</label>
+              <div className="col-md-6">
+                <DatePicker
+                  selected={fromTime}
+                  onChange={handleFromTimeChange}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  // timeIntervals={15}
+                  dateFormat="h:mm aa"
+                  placeholderText="Select from time"
+                  className="form-control"
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
+              <label className="form-label col-md-2">To Time:</label>
+              <div className="col-md-6">
+                <DatePicker
+                  selected={toTime}
+                  onChange={handleToTimeChange}
+                  showTimeSelect
+                  showTimeSelectOnly
+                  // timeIntervals={15}
+                  dateFormat="h:mm aa"
+                  placeholderText="Select to time"
+                  className="form-control"
+                  disabled={!isEditing}
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
               <label className="form-label col-md-2">Date of Joining:</label>
               <div className="col-md-4">
                 <input
@@ -609,6 +684,7 @@ const EmployeeMasterComponent = () => {
             </div>
 
             <div></div>
+     
           </form>
         </div>
       </div>

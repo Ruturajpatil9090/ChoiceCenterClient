@@ -8,6 +8,7 @@ import UserCreationCompoenent from './Components/UserCreation/UserCreationCompoe
 import EmployeeMasterUtility from "./Components/EmployeeMaster/EmployeeMasterUtility"
 import UserCreationUtility from "./Components/UserCreation/UserCreationUtility"
 import SalaryUtility from "./Components/Salary/SalaryUtility"
+import Footer from "./Components/Pages/Footer/Footer"
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/user_Creation_utility"  element={<UserCreationUtility/>} /> 
         </Routes>
       </div>
+      <Footer/>
     </Router>
   );
 };

@@ -79,6 +79,8 @@ function EmployeeMasterUtility() {
     navigate("/home");
   };
 
+
+
   return (
     <div className="container mt-4">
       <div className="row">
@@ -120,6 +122,7 @@ function EmployeeMasterUtility() {
             <th scope="col">Date Of Joining</th>
             <th scope="col">Resigned</th>
             <th scope="col">Basic Salary</th>
+            <th scope="col">From Time</th>
           </tr>
         </thead>
         <tbody>
@@ -135,6 +138,8 @@ function EmployeeMasterUtility() {
               <td>{post.Date_Of_Joining}</td>
               <td>{post.Resigned}</td>
               <td>{post.Basic_Salary}</td>
+              <td>{post.From_Time}</td>
+
             </tr>
           ))}
         </tbody>
