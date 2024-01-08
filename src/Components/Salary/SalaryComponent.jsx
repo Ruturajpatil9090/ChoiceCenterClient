@@ -26,9 +26,7 @@ var typeEmpoyeeHours = "";
 var totalLateMinutes = "";
 var LocalStorageDays = "";
 
-
 const SalaryComponent = () => {
- 
   const apiURL = process.env.REACT_APP_API_URL;
   //Button Enabled and Disabled Functionality state
   const addNewButtonRef = useRef(null);
@@ -129,7 +127,7 @@ const SalaryComponent = () => {
       setIsNewSalaryGenerated(true);
       setAddOneButtonEnabled(true);
       window.alert("Data saved successfully!");
-      window.location.reload()
+      window.location.reload();
     }
   };
   const handleBack = () => {
@@ -149,7 +147,6 @@ const SalaryComponent = () => {
 
   //FetchLastRecord this Function  call on cancel button is click and show last record on table.
   const fetchLastRecord = async () => {
-     
     try {
       const response = await axios.get(
         `${apiURL}/api/employees/getlastrecord?salaryNo=${lastSalaryNoCancel}`
@@ -159,13 +156,14 @@ const SalaryComponent = () => {
         const lastRecordData = response.data.lastRecord;
         newSetSelectedUserId = lastRecordData[0].userId;
         newSetEmployeeName = lastRecordData[0].Employee_name;
- 
+
         DaysInMonthNew = lastRecordData[0].daysInMonth;
         newNetRatePerHour = lastRecordData[0].netRatePerHour;
         newBasicSalry = lastRecordData[0].Basic_salary;
         newSalaryDate = lastRecordData[0].salaryDate;
         totalLateMinutes = lastRecordData[0].Late;
-        
+        setTotalAbsentDays(lastRecordData[0].MonthlyOff);
+        setSundayAbsentCount(lastRecordData[0].MonthlySundayOff);
 
         EmpHours = lastRecordData[0].EmployeeHours;
 
@@ -188,7 +186,7 @@ const SalaryComponent = () => {
         const parsedDate = new Date(
           parseInt(dateParts[2], 10),
           parseInt(dateParts[1], 10) - 1,
-          parseInt(dateParts[0], 10) +1
+          parseInt(dateParts[0], 10) + 1
         );
 
         setSelectedDate(parsedDate);
@@ -219,7 +217,9 @@ const SalaryComponent = () => {
               newBasicSalry: matchingRecord.Basic_salary,
               id: matchingRecord.id,
               salaryDate: matchingRecord.salaryDate,
-              Late:matchingRecord.Late
+              Late: matchingRecord.Late,
+              totalAbsentDays: matchingRecord.totalAbsentDays,
+              sundayAbsentCount: matchingRecord.sundayAbsentCount,
             };
 
             // Handle log and out times
@@ -285,7 +285,6 @@ const SalaryComponent = () => {
         }
 
         setFilteredData(allDatesData);
-        
       } else {
         console.error(
           "Failed to fetch the last record. Server responded with:",
@@ -303,7 +302,6 @@ const SalaryComponent = () => {
 
   //handle cancel button functionality
   const handleCancel = () => {
-    
     // setFilteredData([]);
     // newSetSelectedUserId = "";
     // newSetEmployeeName = "";
@@ -343,17 +341,19 @@ const SalaryComponent = () => {
 
   //functionality of all feilds in Head section
   const handleDateChange = (e) => {
-    const { value } = e.target;
-    const date = new Date(value);
-    setSelectedDate(date);
-
-    // Reset totalMonthlySalary and totalHours
-    setTotalMonthlySalary("0.00");
-    setTotalHours("0.00");
-    setTotalSundayDeduction("0.00");
-
-    fetchData(date);
+    const newDate = new Date(e.target.value);
+    setSelectedDate(newDate);
   };
+
+  useEffect(() => {
+    // Update the date to be the first day of the previous month when the component mounts
+    if (!isCancelButtonClicked) {
+      const currentDate = new Date();
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      currentDate.setDate(1); // Set the day to 1
+      setSelectedDate(currentDate);
+    }
+  }, [isCancelButtonClicked]);
 
   const handleSalaryDate = (e) => {
     const { value } = e.target;
@@ -379,33 +379,26 @@ const SalaryComponent = () => {
       const apiData = apiResponse.data.lastRecord;
       // console.log(apiData);
       const pdf = new jsPDF({
-        orientation: "landscape",
+        orientation: "portrait",
       });
-
-      // Add company name, employee code, and employee name
-      pdf.text(`Salary No: ${salaryDetails.salaryNo}`, 20, 10);
-      pdf.text(
-        "Company Name: Choice Centre In Mahadwar Road, Kolhapur.",
-        20,
-        20
-      );
+      pdf.setFontSize(10);
+      pdf.text(`Salary No: ${salaryDetails.salaryNo}`, 15, 10);
       pdf.text(
         `Employee Code: ${
           isCancelButtonClicked ? newSetSelectedUserId : selectedUserId
         }`,
-        20,
-        30
+        15,
+        15
       );
       pdf.text(
         `Employee Name: ${
           isCancelButtonClicked ? newSetEmployeeName : selectedEmployeeName
         }`,
-        20,
-        40
+        15,
+        20
       );
-
       pdf.text(
-        `Slary Date: ${formatDate(selectedSalaryDate)}`,
+        `Salary Date: ${formatDate(selectedSalaryDate)}`,
         pdf.internal.pageSize.width - 80,
         10
       );
@@ -414,7 +407,7 @@ const SalaryComponent = () => {
           isCancelButtonClicked ? DaysInMonthNew : salaryDetails.daysInMonth
         }`,
         pdf.internal.pageSize.width - 80,
-        20
+        15
       );
 
       // Add data from the API to the PDF
@@ -426,23 +419,24 @@ const SalaryComponent = () => {
         "Late",
         "Day",
         "Date",
-        "Total Hours",
-        "Net Rate per Hour",
-        "Per Day Salary (Rs)",
+        "D/HRS",
+        "RT/HRS",
+        "PSL/D",
         "Deduction",
         ...Array.from({ length: maxLogTimes }, (_, idx) => [
-          `In Time ${idx + 1}`,
-          `Out Time ${idx + 1}`,
+          `In ${idx + 1}`,
+          `Out ${idx + 1}`,
         ]).flat(),
       ];
 
       // Add data to the table
       const data = filteredData.map((entry) => [
-        entry.Late ? {
-          content: entry.Late > 0 ? entry.Late : "0.00",
-          styles: { textColor: entry.Late > 0 ? [255, 0, 0] : [0, 0, 0] }
-        } : "0.00",
-  
+        entry.Late
+          ? {
+              content: entry.Late > 0 ? entry.Late : "0.00",
+              styles: { textColor: entry.Late > 0 ? [255, 0, 0] : [0, 0, 0] },
+            }
+          : "0.00",
 
         // ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][entry.date.getDay()]
         entry.day,
@@ -463,33 +457,53 @@ const SalaryComponent = () => {
           .flat(),
       ]);
 
-      // console.log(data);
-      // Add the table to the PDF
       pdf.autoTable({
-        startY: 50,
+        startY: 30, // Adjust startY to leave space for the header information
         head: [headers],
         body: data,
+        margin: { bottom: 10 },
+        styles: {
+          fontSize: 8,
+          cellPadding: 1,
+          lineHeight: 1,
+        },
       });
+      const totalMonthlySalaryX = pdf.internal.pageSize.width - 80;
+      // Add summary information
+      pdf.setFontSize(10);
+      pdf.text(
+        `\u2022 Total Monthly Hours: ${totalHours} Hr`,
+        15,
+        pdf.autoTable.previous.finalY + 10
+      );
+      pdf.text(
+        `\u2022 Total Sunday Deduction On Month: ${totalSundayDeduction}`,
+        15,
+        pdf.autoTable.previous.finalY + 15
+      );
+      // Add "Total Monthly Salary" on the right side
 
-      // Add total hours and total monthly salary
       pdf.text(
-        `Total monthly Hours: ${totalHours}`,
-        20,
-        pdf.internal.pageSize.height - 40
+        `\u2022 MonthlyOff Days: ${totalAbsentDays}`,
+        15,
+        pdf.autoTable.previous.finalY + 20
       );
       pdf.text(
-        `Total Deduction on month: ${totalSundayDeduction}`,
-        20,
-        pdf.internal.pageSize.height - 30
+        `\u2022 Total Sunday's Count in MonthlyOff: ${sundayAbsentCount}`,
+        15,
+        pdf.autoTable.previous.finalY + 25
       );
+      pdf.setFontSize(14);
       pdf.text(
-        `Total Monthly Salary (Rs): ${totalMonthlySalary}`,
-        20,
-        pdf.internal.pageSize.height - 20
+        ` Total: ${totalMonthlySalary}/-`,
+        totalMonthlySalaryX,
+        pdf.autoTable.previous.finalY + 10
       );
 
       // Save the PDF
-      pdf.save(`salary_details_${selectedEmployeeName}.pdf`);
+      pdf.save(
+        `salary_details_${isCancelButtonClicked ? newSetEmployeeName : ""}.pdf`
+      );
     } catch (error) {
       console.error("Error generating PDF:", error);
     }
@@ -589,7 +603,7 @@ const SalaryComponent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-   
+
     setSalaryDetails({
       ...salaryDetails,
       [name]: value,
@@ -731,15 +745,19 @@ const SalaryComponent = () => {
   const fixedRatePerHour = isEditMode ? newNetRatePerHour : selectedRatePerHour;
   const [totalMonthlySalary, setTotalMonthlySalary] = useState(0);
 
+  const [totalAbsentDays, setTotalAbsentDays] = useState(0);
+  const [sundayAbsentCount, setSundayAbsentCount] = useState(0);
+
   const calculateTotal = () => {
     let totalHours = 0;
     let totalRate = 0;
     let totalSundayDeduction = 0;
     const dailySalaries = [];
+    let absentDays = []; // Array to store dates of absent days
+    let sundayCount = 0; // Variable to keep track of Sundays
 
     filteredData.forEach((entry) => {
       const hours = calculateTotalHours(entry.logTimes, entry.outTimes);
-      // console.log("total all array hours", hours);
       const integerPart = parseInt(hours);
       const decimalPart = parseFloat((hours - integerPart).toFixed(2));
 
@@ -753,7 +771,6 @@ const SalaryComponent = () => {
 
       hourlyRate = Ratecalculate;
 
-      // Calculate salary for the day
       const perDaySalary = (
         integerPart * hourlyRate +
         ((decimalPart * hourlyRate) / 60) * 100
@@ -763,8 +780,24 @@ const SalaryComponent = () => {
       totalHours += hours;
       totalRate += hourlyRate;
 
-      // console.log("totalRate", totalRate);
-      // Check if the day is Sunday and there are no logTimes and outTimes
+      // Check if the day is Saturday (6 represents Saturday in JavaScript's Date object)
+      if (entry.date.getDay() === 6) {
+        // Saturday is a holiday, so skip further calculations for this day
+        return;
+      }
+
+      // Check if the employee has logged hours for the day
+      if (hours === 0) {
+        // If the employee hasn't logged hours, consider them absent
+        absentDays.push(formatDate(entry.date));
+
+        // Check if the absent day is a Sunday
+        if (entry.date.getDay() === 0) {
+          sundayCount++;
+        }
+      }
+
+      // Calculate Sunday deduction
       if (entry.date.getDay() === 0 && hours === 0) {
         const denominator = salaryDetails.daysInMonth;
         const newDataBasicSalry = isEditMode
@@ -772,7 +805,6 @@ const SalaryComponent = () => {
           : selectBasicSalary;
         if (denominator !== 0) {
           const sundayDeduction = hourlyRate * typeEmpoyeeHours * 2;
-          // console.log("sundayDeduction", sundayDeduction);
           totalSundayDeduction += sundayDeduction;
         } else {
           console.error(
@@ -785,7 +817,6 @@ const SalaryComponent = () => {
     setTotalHours(totalHours.toFixed(2));
     setNetRate(totalRate.toFixed(2));
     setPerDaySalaries(dailySalaries);
-
     setTotalSundayDeduction(totalSundayDeduction.toFixed(2));
 
     // Calculate total monthly salary, deducting Sunday salary
@@ -794,6 +825,19 @@ const SalaryComponent = () => {
       0
     );
     setTotalMonthlySalary(totalSalary);
+
+    setTotalAbsentDays(absentDays.length);
+    setSundayAbsentCount(sundayCount);
+
+    // Print or use the dates of absent days
+    console.log("Absent Dates (excluding Saturdays):", absentDays);
+
+    // Print or use the count of Sundays among absent days
+    console.log("Sundays among Absent Days:", sundayAbsentCount);
+
+    // Print or use the total count of absent days for the month
+    const totalAbsentDays = absentDays.length;
+    console.log("Total Monthly Absent Count:", totalAbsentDays);
   };
 
   //In this function we haev to calculate the differnece between the in time and out time
@@ -849,10 +893,9 @@ const SalaryComponent = () => {
 
   //In this function we have to save the data on database
   const saveDataToConsole = () => {
-    sessionStorage.setItem('DaysInMonthNew',salaryDetails.daysInMonth);
+    sessionStorage.setItem("DaysInMonthNew", salaryDetails.daysInMonth);
     // localStorage.setItem('selectDateNew',selectedSalaryDate)
     const jsonData = filteredData.map((entry, index) => {
-
       const lateStatus = checkLateStatus(
         formatTime(entry.logTimes[0]),
         fromTime
@@ -893,10 +936,13 @@ const SalaryComponent = () => {
           ? `-${parseFloat(hourlyRate * fixedRatePerHour * 2).toFixed(2)}`
           : 0,
         Late: isCancelButtonClicked ? entry.Late : lateStatus,
-        
+        MonthlyOff: isCancelButtonClicked ? entry.MonthlyOff : totalAbsentDays,
+        MonthlySundayOff: isCancelButtonClicked
+          ? entry.MonthlySundayOff
+          : sundayAbsentCount,
       };
     });
-   
+
     if (isEditMode) {
       updateDataInDatabase(jsonData);
     } else {
@@ -1065,7 +1111,7 @@ const SalaryComponent = () => {
               newBasicSalry: matchingRecord.Basic_salary,
               id: matchingRecord.id,
               salaryDate: matchingRecord.salaryDate,
-              Late:matchingRecord.Late
+              Late: matchingRecord.Late,
             };
 
             // Handle log and out times
@@ -1161,39 +1207,48 @@ const SalaryComponent = () => {
       fetchLastSalaryNo();
       const DaysInMonthNew = "DaysInMonthNew";
       LocalStorageDays = localStorage.getItem(DaysInMonthNew);
-  
+
       console.log("LocalStorageDays", LocalStorageDays);
     }
   }, [editRecordData]);
 
   //late logic
 
-  const checkLateStatus = (actualTime, expectedTime) => {
-    const actual = new Date(`2024-01-01T${actualTime}`);
-    const expected = new Date(`2024-01-01T${expectedTime}`);
+let totalGreenMinutes = 0;
+let totalRedMinutes = 0;
+
+const checkLateStatus = (actualTime, expectedTime) => {
+  const actual = new Date(`2024-01-01T${actualTime}`);
+  const expected = new Date(`2024-01-01T${expectedTime}`);
+  const gracePeriodInMinutes = 15;
+
+  if (isNaN(actual.getTime()) || isNaN(expected.getTime())) {
+    return {
+      value: "0",
+      color: "black", // or any default color
+    };
+  }
+
+  if (actual.getTime() < expected.getTime()) {
+    const timeDifferenceInMinutes = (expected - actual) / (60 * 1000);
+    totalGreenMinutes += Math.round(timeDifferenceInMinutes);
+    return {
+      value: Math.round(timeDifferenceInMinutes),
+      color: "green",
+    };
+  } else {
+    const timeDifferenceInMinutes = (actual - expected) / (60 * 1000);
+    const remainingLateMinutes = Math.max(0, timeDifferenceInMinutes - gracePeriodInMinutes);
+    totalRedMinutes += remainingLateMinutes;
+    const roundedLateMinutes = Math.round(remainingLateMinutes);
+    return {
+      value: `${roundedLateMinutes}`,
+      color: "red",
+    };
+  }
+};
+ 
   
-    const gracePeriodInMinutes = 15;
-  
-    if (isNaN(actual.getTime()) || isNaN(expected.getTime())) {
-      // Handle NaN values, return 0
-      var zero = "0.00"
-      return zero;
-    }
-  
-    if (actual <= expected) {
-      return "0.00";
-    } else {
-      // Employee is late
-      const timeDifferenceInMinutes = (actual - expected) / (60 * 1000);
-      const remainingLateMinutes = Math.max(0, timeDifferenceInMinutes - gracePeriodInMinutes);
-  
-      // Update cumulative late time
-      totalLateMinutes += remainingLateMinutes;
-  
-      // You can return the remaining late minutes if needed
-      return `${remainingLateMinutes.toFixed(2)}`;
-    }
-  };
   
 
   return (
@@ -1264,7 +1319,7 @@ const SalaryComponent = () => {
             value={salaryDetails.userId}
             onAcCodeClick={handleEmployeeCode}
             disabled={disabledFields}
-            userIdNew={isCancelButtonClicked ?   newSetSelectedUserId : ""}
+            userIdNew={isCancelButtonClicked ? newSetSelectedUserId : ""}
             newSetEmployeeName={isCancelButtonClicked ? newSetEmployeeName : ""}
             isCancelButtonClickeded={
               isCancelButtonClicked && !isaddButtonClicked
@@ -1462,25 +1517,24 @@ const SalaryComponent = () => {
                   {/* {isCancelButtonClicked ? <td>{entry.id}</td> : ""} */}
 
                   {isCancelButtonClicked ? (
-                    <td>{entry.Late}</td>
-                  ) : (
-                    <td>
-                    
-                    {checkLateStatus(formatTime(entry.logTimes[0]), fromTime) >
-                    0 ? (
-                      <span style={{ color: "red" }}>
-                        {checkLateStatus(
-                          formatTime(entry.logTimes[0]),
-                          fromTime
-                        )}
-                      </span>
-                    ) : (
-                      "0.00"
-                    )}
-                  </td>
-                  )}
-
-                  
+  <td>{entry.Late}</td>
+) : (
+  <td>
+    {checkLateStatus(
+      formatTime(entry.logTimes[0]),
+      fromTime
+    ).value > 0 ? (
+      <span style={{ color: checkLateStatus(formatTime(entry.logTimes[0]), fromTime).color }}>
+        {checkLateStatus(
+          formatTime(entry.logTimes[0]),
+          fromTime
+        ).value}
+      </span>
+    ) : (
+      "0"
+    )}
+  </td>
+)}
 
                   {/* <td>{fromTime}</td> */}
                   <td>
@@ -1585,6 +1639,27 @@ const SalaryComponent = () => {
             <label>Total Monthly Salary (Rs):</label>
             <strong>{totalMonthlySalary}</strong>
           </div>
+
+          <div>
+            <label>Total Monthly Absent Count:</label>
+            <strong>{totalAbsentDays}</strong>
+          </div>
+
+          <div>
+            <label>Total Monthly Sunday Absent Count:</label>
+            <strong>{sundayAbsentCount}</strong>
+          </div>
+
+          <div>
+  <label>Total Green Minutes:</label> <strong style={{ color: "green" }}>{totalGreenMinutes}</strong>
+</div>
+
+<div>
+  <label>Total Red Minutes:</label> <strong style={{ color: "red" }}>{totalRedMinutes}</strong>
+</div>
+
+
+
         </div>
       </div>
       {editModalOpen && (
