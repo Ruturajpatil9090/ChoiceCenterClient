@@ -81,7 +81,7 @@ const Login = () => {
       <div className="col-md-4">
         <div className="card shadow">
           <div className="card-body">
-          <img src={logo} alt="" width="100" height="100" style={{marginLeft:"230px"}} />
+          <img src={logo} alt="" width="100" height="100" style={{marginLeft:"200px"}} />
 
             <h2 className="text-center mb-4 custom-heading" >Choice Center</h2>
             <div className="form-group">

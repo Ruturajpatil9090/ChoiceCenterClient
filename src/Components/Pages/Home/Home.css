@@ -18,7 +18,7 @@
   display: inline-block;
   font-size: 150px;
   top: 20%;
-  left: 20%;
+  left: 15%;
   position: fixed;
 }
 
@@ -41,7 +41,7 @@
 
   .button-container {
     margin-top: 300px; 
-    margin-left: 500px;
+    margin-left: 400px;
     width: 60%;
     height:30px;
    

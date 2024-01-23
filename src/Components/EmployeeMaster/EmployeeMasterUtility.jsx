@@ -123,6 +123,7 @@ function EmployeeMasterUtility() {
             <th scope="col">Resigned</th>
             <th scope="col">Basic Salary</th>
             <th scope="col">From Time</th>
+            <th scope="col">To Time</th>
           </tr>
         </thead>
         <tbody>
@@ -139,6 +140,7 @@ function EmployeeMasterUtility() {
               <td>{post.Resigned}</td>
               <td>{post.Basic_Salary}</td>
               <td>{post.From_Time}</td>
+              <td>{post.To_Time}</td>
 
             </tr>
           ))}

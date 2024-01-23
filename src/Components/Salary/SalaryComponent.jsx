@@ -23,7 +23,7 @@ var Ratecalculate = "";
 var Ratecalculated = "";
 var EmpHours = "";
 var typeEmpoyeeHours = "";
-var totalLateMinutes = "";
+var totalLateMinutes = 0;
 var LocalStorageDays = "";
 
 const SalaryComponent = () => {
@@ -1212,45 +1212,37 @@ const SalaryComponent = () => {
     }
   }, [editRecordData]);
 
+
   //late logic
 
-let totalGreenMinutes = 0;
-let totalRedMinutes = 0;
-
-const checkLateStatus = (actualTime, expectedTime) => {
-  const actual = new Date(`2024-01-01T${actualTime}`);
-  const expected = new Date(`2024-01-01T${expectedTime}`);
-  const gracePeriodInMinutes = 15;
-
-  if (isNaN(actual.getTime()) || isNaN(expected.getTime())) {
-    return {
-      value: "0",
-      color: "black", // or any default color
-    };
-  }
-
-  if (actual.getTime() < expected.getTime()) {
-    const timeDifferenceInMinutes = (expected - actual) / (60 * 1000);
-    totalGreenMinutes += Math.round(timeDifferenceInMinutes);
-    return {
-      value: Math.round(timeDifferenceInMinutes),
-      color: "green",
-    };
-  } else {
-    const timeDifferenceInMinutes = (actual - expected) / (60 * 1000);
-    const remainingLateMinutes = Math.max(0, timeDifferenceInMinutes - gracePeriodInMinutes);
-    totalRedMinutes += remainingLateMinutes;
-    const roundedLateMinutes = Math.round(remainingLateMinutes);
-    return {
-      value: `${roundedLateMinutes}`,
-      color: "red",
-    };
-  }
+  const checkLateStatus = (actualTime, expectedTime) => {
+    const actual = new Date(`2024-01-01T${actualTime}`);
+    const expected = new Date(`2024-01-01T${expectedTime}`);
+  
+    const gracePeriodInMinutes = 15;
+  
+    if (isNaN(actual.getTime()) || isNaN(expected.getTime())) {
+      // Handle NaN values, return 0
+      var zero = "0.00"
+      return zero;
+    }
+  
+    if (actual <= expected) {
+      return "0.00";
+    } else {
+      // Employee is late
+      const timeDifferenceInMinutes = (actual - expected) / (60 * 1000);
+      const remainingLateMinutes = Math.max(0, timeDifferenceInMinutes - gracePeriodInMinutes);
+  
+      // Update cumulative late time
+      totalLateMinutes += remainingLateMinutes;
+  
+      // You can return the rounded remaining late minutes
+      return `${Math.round(remainingLateMinutes)}`;
+    }
 };
- 
   
   
-
   return (
     <div className="container">
       <h3 className="mt-4 mb-4 text-center custom-heading">Genrate Salary</h3>
@@ -1517,24 +1509,24 @@ const checkLateStatus = (actualTime, expectedTime) => {
                   {/* {isCancelButtonClicked ? <td>{entry.id}</td> : ""} */}
 
                   {isCancelButtonClicked ? (
-  <td>{entry.Late}</td>
-) : (
-  <td>
-    {checkLateStatus(
-      formatTime(entry.logTimes[0]),
-      fromTime
-    ).value > 0 ? (
-      <span style={{ color: checkLateStatus(formatTime(entry.logTimes[0]), fromTime).color }}>
-        {checkLateStatus(
-          formatTime(entry.logTimes[0]),
-          fromTime
-        ).value}
-      </span>
-    ) : (
-      "0"
-    )}
-  </td>
-)}
+                    <td>{entry.Late}</td>
+                  ) : (
+                    <td>
+                    
+                    {checkLateStatus(formatTime(entry.logTimes[0]), fromTime) >
+                    0 ? (
+                      <span style={{ color: "red" }}>
+                        {checkLateStatus(
+                          formatTime(entry.logTimes[0]),
+                          fromTime
+                        )}
+                      </span>
+                    ) : (
+                      "0.00"
+                    )}
+                  </td>
+                  )}
+
 
                   {/* <td>{fromTime}</td> */}
                   <td>
@@ -1649,16 +1641,11 @@ const checkLateStatus = (actualTime, expectedTime) => {
             <label>Total Monthly Sunday Absent Count:</label>
             <strong>{sundayAbsentCount}</strong>
           </div>
-
-          <div>
-  <label>Total Green Minutes:</label> <strong style={{ color: "green" }}>{totalGreenMinutes}</strong>
-</div>
-
-<div>
-  <label>Total Red Minutes:</label> <strong style={{ color: "red" }}>{totalRedMinutes}</strong>
-</div>
-
-
+          {/* <div>
+            <label>Total Late:</label>
+            <strong>{totalLateMinutes}</strong>
+          </div> */}
+          
 
         </div>
       </div>
