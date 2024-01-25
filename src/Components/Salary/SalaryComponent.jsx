@@ -6,7 +6,6 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import axios from "axios";
 import { BsFillPrinterFill } from "react-icons/bs";
-import logo from "../../Assets/late.avif";
 
 //Global variables
 var lastRecordDate = "";
@@ -45,7 +44,6 @@ const SalaryComponent = () => {
   const [highlightedButton, setHighlightedButton] = useState(null);
   const [cancelButtonClicked, setCancelButtonClicked] = useState(false);
   const userIdInputRef = useRef(null);
-
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSalaryDate, setselectedSalaryDate] = useState(new Date());
@@ -56,7 +54,6 @@ const SalaryComponent = () => {
   const [disabledFields, setDisabledFields] = useState(false);
   const [lastRecord, setLastRecord] = useState([]);
   const [isCancelButtonClicked, setIsCancelButtonClicked] = useState(false);
-
   const [isaddButtonClicked, setIsAddButtonClicked] = useState(false);
 
   //handle AddOne button functionality
@@ -67,7 +64,6 @@ const SalaryComponent = () => {
     setEditButtonEnabled(false);
     setDeleteButtonEnabled(false);
     setIsEditMode(false);
-
     setFilteredData([]);
     // Reset totalMonthlySalary and totalHours
     setTotalMonthlySalary("0.00");
@@ -79,12 +75,6 @@ const SalaryComponent = () => {
     newSetSelectedUserId = "";
     newSetEmployeeName = "";
     window.location.reload();
-    // window.location.href = window.location.href;
-
-    // Focus on the dropdown if it exists
-    if (userIdInputRef.current) {
-      userIdInputRef.current.focus();
-    }
   };
 
   //handle Edit button functionality
@@ -136,6 +126,17 @@ const SalaryComponent = () => {
 
   //handle Delete button functionality
   const handleDelete = () => {
+  
+    axios.delete(`http://localhost:5000/api/employees/deleteRecords/${lastSalaryNoCancel}`)
+      .then(response => {
+        window.alert("Record deleted successfully")
+        handleAddOne()
+      })
+      .catch(error => {
+        console.error('Error deleting record:', error.message);
+      });
+  
+    // Update state
     setIsEditMode(false);
     setAddOneButtonEnabled(true);
     setEditButtonEnabled(true);
@@ -345,12 +346,22 @@ const SalaryComponent = () => {
     setSelectedDate(newDate);
   };
 
+//show the last month date on selct date logic
+  const getDefaultDate = () => { 
+    const currentDate = new Date();
+    currentDate.setDate(1);
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    const formattedDate = currentDate.toISOString().slice(0, 10);
+    return formattedDate;
+  };
+
+
   useEffect(() => {
     // Update the date to be the first day of the previous month when the component mounts
     if (!isCancelButtonClicked) {
       const currentDate = new Date();
       currentDate.setMonth(currentDate.getMonth() - 1);
-      currentDate.setDate(1); // Set the day to 1
+      currentDate.setDate(1); 
       setSelectedDate(currentDate);
     }
   }, [isCancelButtonClicked]);
@@ -414,9 +425,9 @@ const SalaryComponent = () => {
       Object.keys(apiData).forEach((key, index) => {
         const entry = apiData[key];
       });
-      // Add table headers
+     
       const headers = [
-        "Late",
+        "Late(min)",
         "Day",
         "Date",
         "D/HRS",
@@ -458,7 +469,7 @@ const SalaryComponent = () => {
       ]);
 
       pdf.autoTable({
-        startY: 30, // Adjust startY to leave space for the header information
+        startY: 30, 
         head: [headers],
         body: data,
         margin: { bottom: 10 },
@@ -469,7 +480,6 @@ const SalaryComponent = () => {
         },
       });
       const totalMonthlySalaryX = pdf.internal.pageSize.width - 80;
-      // Add summary information
       pdf.setFontSize(10);
       pdf.text(
         `\u2022 Total Monthly Hours: ${totalHours} Hr`,
@@ -481,8 +491,6 @@ const SalaryComponent = () => {
         15,
         pdf.autoTable.previous.finalY + 15
       );
-      // Add "Total Monthly Salary" on the right side
-
       pdf.text(
         `\u2022 MonthlyOff Days: ${totalAbsentDays}`,
         15,
@@ -508,6 +516,7 @@ const SalaryComponent = () => {
       console.error("Error generating PDF:", error);
     }
   };
+
 
   //After slect the salary Date and UserId we have to show that particular month data
   const fetchData = async (selectedDate) => {
@@ -601,6 +610,7 @@ const SalaryComponent = () => {
     setFilteredData(filteredDataArray);
   };
 
+  //we have to change the sate input values on this method
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -621,6 +631,8 @@ const SalaryComponent = () => {
     return `${year}-${month}-${day}`;
   }
 
+
+  //Employee Help we have to get the data that data we ahe to set into states
   const [selectedEmployeeName, setSelectedEmployeeName] = useState("");
   const [selectedRatePerHour, setSelectedRatePerHour] = useState(0);
   const [EmployeeHours, setEmployeeHours] = useState(0);
@@ -637,7 +649,8 @@ const SalaryComponent = () => {
     setFromTime(time);
   };
 
-  //In this function we have to fetch the how many days that employee present on that month.
+  //In this function we have to enter the value of how many days that employee present on that month.
+  //or how many days salary we have to give for that particular month
   const getDatesInMonth = (year, month) => {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
@@ -654,7 +667,7 @@ const SalaryComponent = () => {
     return dates;
   };
 
-  //In this code after clcik the particular time we haev to edit that time
+  //In this code after clcik the particular time we haev to edit that time in the popup box.
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editRowIndex, setEditRowIndex] = useState(null);
   const [editColumnIndex, setEditColumnIndex] = useState(null);
@@ -703,18 +716,13 @@ const SalaryComponent = () => {
   // Modify the formatDate function
   const formatDate = (date) => {
     try {
-      // Check if date is already a Date object
       const parsedDate = date instanceof Date ? date : new Date(date);
-
       if (isNaN(parsedDate.getTime())) {
         throw new Error("Invalid date format");
       }
-
-      // Implement your date formatting logic
       const day = parsedDate.getDate().toString().padStart(2, "0");
       const month = (parsedDate.getMonth() + 1).toString().padStart(2, "0");
       const year = parsedDate.getFullYear();
-
       return `${day}-${month}-${year}`;
     } catch (error) {
       console.error("Error formatting date:", error);
@@ -737,40 +745,35 @@ const SalaryComponent = () => {
     }
   };
 
+  //here we have to calculate the total all calculation done in here..
   const [totalHours, setTotalHours] = useState(0);
   const [totalRate, setNetRate] = useState(0);
   const [totalSundayDeduction, setTotalSundayDeduction] = useState(0);
   const [perDaySalaries, setPerDaySalaries] = useState([]);
-
   const fixedRatePerHour = isEditMode ? newNetRatePerHour : selectedRatePerHour;
   const [totalMonthlySalary, setTotalMonthlySalary] = useState(0);
-
   const [totalAbsentDays, setTotalAbsentDays] = useState(0);
   const [sundayAbsentCount, setSundayAbsentCount] = useState(0);
 
+  //In this function we have to calculaet the total monthly salary and and total deduction....
   const calculateTotal = () => {
     let totalHours = 0;
     let totalRate = 0;
     let totalSundayDeduction = 0;
     const dailySalaries = [];
-    let absentDays = []; // Array to store dates of absent days
-    let sundayCount = 0; // Variable to keep track of Sundays
+    let absentDays = []; 
+    let sundayCount = 0; 
 
     filteredData.forEach((entry) => {
       const hours = calculateTotalHours(entry.logTimes, entry.outTimes);
       const integerPart = parseInt(hours);
       const decimalPart = parseFloat((hours - integerPart).toFixed(2));
-
       const typeSalary = isEditMode ? newBasicSalry : selectBasicSalary;
       const RatePerHours = typeSalary / salaryDetails.daysInMonth;
-
       typeEmpoyeeHours = isEditMode ? EmpHours : fixedRatePerHour;
-
       Ratecalculated = RatePerHours / typeEmpoyeeHours;
       Ratecalculate = Math.round(Ratecalculated * 100) / 100;
-
       hourlyRate = Ratecalculate;
-
       const perDaySalary = (
         integerPart * hourlyRate +
         ((decimalPart * hourlyRate) / 60) * 100
@@ -779,25 +782,17 @@ const SalaryComponent = () => {
       dailySalaries.push(Math.round(perDaySalary));
       totalHours += hours;
       totalRate += hourlyRate;
-
-      // Check if the day is Saturday (6 represents Saturday in JavaScript's Date object)
       if (entry.date.getDay() === 6) {
-        // Saturday is a holiday, so skip further calculations for this day
         return;
       }
-
-      // Check if the employee has logged hours for the day
       if (hours === 0) {
-        // If the employee hasn't logged hours, consider them absent
         absentDays.push(formatDate(entry.date));
-
-        // Check if the absent day is a Sunday
         if (entry.date.getDay() === 0) {
           sundayCount++;
         }
       }
 
-      // Calculate Sunday deduction
+      // Calculate Sunday deduction logic here..
       if (entry.date.getDay() === 0 && hours === 0) {
         const denominator = salaryDetails.daysInMonth;
         const newDataBasicSalry = isEditMode
@@ -825,22 +820,14 @@ const SalaryComponent = () => {
       0
     );
     setTotalMonthlySalary(totalSalary);
-
     setTotalAbsentDays(absentDays.length);
     setSundayAbsentCount(sundayCount);
-
-    // Print or use the dates of absent days
-    console.log("Absent Dates (excluding Saturdays):", absentDays);
-
-    // Print or use the count of Sundays among absent days
-    console.log("Sundays among Absent Days:", sundayAbsentCount);
-
     // Print or use the total count of absent days for the month
     const totalAbsentDays = absentDays.length;
-    console.log("Total Monthly Absent Count:", totalAbsentDays);
+   
   };
 
-  //In this function we haev to calculate the differnece between the in time and out time
+  //In this function we have to calculate the differnece between the in time and out time
   const calculateTotalHours = (logTimes, outTimes) => {
     let totalMinutes = 0;
 
@@ -851,18 +838,15 @@ const SalaryComponent = () => {
       const minutes = Math.floor(diffMilliseconds / (1000 * 60));
       totalMinutes += minutes;
     }
-
     // Calculate total hours and remaining minutes
     const totalHours = Math.floor(totalMinutes / 60);
     const remainingMinutes = totalMinutes % 60;
-
     // Format the result as "hours.minutes"
     const formattedTotalHours = totalHours + remainingMinutes / 100;
-
     return formattedTotalHours;
   };
 
-  //save button click save data on console
+  //In this function we have to save data to the database after save button is clicked...
   const saveDataToDatabase = async (jsonData) => {
     try {
       const response = await axios.post(
@@ -891,7 +875,7 @@ const SalaryComponent = () => {
     }
   };
 
-  //In this function we have to save the data on database
+  //In this function we have to before saving the data on database we have to print that data on console.
   const saveDataToConsole = () => {
     sessionStorage.setItem("DaysInMonthNew", salaryDetails.daysInMonth);
     // localStorage.setItem('selectDateNew',selectedSalaryDate)
@@ -963,7 +947,8 @@ const SalaryComponent = () => {
     return Object.assign({}, ...logTimeObjects, ...outTimeObjects);
   };
 
-  //In this code we have to update the data from datatabse
+
+  //In this code we have to update the data from datatabse logic.
   const updateDataInDatabase = async (jsonData) => {
     try {
       const response = await axios.put(
@@ -1004,7 +989,6 @@ const SalaryComponent = () => {
           : 0;
 
         lastSalaryNoCancel = lastSalaryNo;
-
         setSalaryDetails({
           salaryNo: lastSalaryNo + 1,
         });
@@ -1036,7 +1020,6 @@ const SalaryComponent = () => {
   const location = useLocation();
   const editRecordData = location.state && location.state.editRecordData;
 
-  // console.log("editRecordData", editRecordData);
   const fetchRecordDoubleClick = async () => {
     try {
       const response = await axios.get(
@@ -1060,10 +1043,8 @@ const SalaryComponent = () => {
         DaysInMonthNew = lastRecordData[0].daysInMonth;
         newNetRatePerHour = lastRecordData[0].netRatePerHour;
         newBasicSalry = lastRecordData[0].Basic_salary;
-
         newSalaryDate = lastRecordData[0].salaryDate;
-
-        // Update the salary details state
+        EmpHours = lastRecordData[0].EmployeeHours;
         setSalaryDetails({
           salaryNo: lastRecordData[0].salary_no,
           daysInMonth: DaysInMonthNew,
@@ -1078,12 +1059,12 @@ const SalaryComponent = () => {
         // Parse the date string into a JavaScript Date object
         const dateParts = lastRecordData[0].date.split("-");
         const parsedDate = new Date(
-          parseInt(dateParts[2], 10), // Year
-          parseInt(dateParts[1], 10) - 1, // Month (0-indexed)
-          parseInt(dateParts[0], 10) // Day
+          parseInt(dateParts[2], 10), 
+          parseInt(dateParts[1], 10) - 1, 
+          parseInt(dateParts[0], 10) 
         );
 
-        setSelectedDate(parsedDate); // Set the parsed date
+        setSelectedDate(parsedDate);
 
         // Update the filteredData state
         const allDatesData = getDatesInMonth(
@@ -1213,12 +1194,11 @@ const SalaryComponent = () => {
   }, [editRecordData]);
 
 
-  //late logic
-
+ //In this function we have to calculate the how many time Employee is late on the particular month.
   const checkLateStatus = (actualTime, expectedTime) => {
-    const actual = new Date(`2024-01-01T${actualTime}`);
-    const expected = new Date(`2024-01-01T${expectedTime}`);
-  
+    const currentYear = new Date().getFullYear();
+    const actual = new Date(`${currentYear}-01-01T${actualTime}`);
+    const expected = new Date(`${currentYear}-01-01T${expectedTime}`);
     const gracePeriodInMinutes = 15;
   
     if (isNaN(actual.getTime()) || isNaN(expected.getTime())) {
@@ -1241,7 +1221,6 @@ const SalaryComponent = () => {
       return `${Math.round(remainingLateMinutes)}`;
     }
 };
-  
   
   return (
     <div className="container">
@@ -1298,7 +1277,7 @@ const SalaryComponent = () => {
           <input
             type="date"
             className="form-control"
-            value={selectedDate.toISOString().slice(0, 10)}
+            value={getDefaultDate()}
             onChange={handleDateChange}
             disabled={isCancelButtonClicked && !isaddButtonClicked}
           />
@@ -1404,7 +1383,7 @@ const SalaryComponent = () => {
               >
                 Edit
               </button>
-              {/* <button
+              <button
                 onClick={handleDelete}
                 disabled={!deleteButtonEnabled}
                 style={{
@@ -1418,7 +1397,7 @@ const SalaryComponent = () => {
                 }}
               >
                 Delete
-              </button> */}
+              </button>
               <button
                 onClick={handleCancel}
                 disabled={!cancelButtonEnabled}
@@ -1459,7 +1438,8 @@ const SalaryComponent = () => {
             >
               <div className="col-md-12 ">
                 <div>
-                  <button className="btn btn-primary" onClick={calculateTotal}>
+                  <button className="btn btn-primary" onClick={calculateTotal} disabled={isCancelButtonClicked && !isEditMode}>
+                    
                     Calculate
                   </button>
 
@@ -1485,7 +1465,7 @@ const SalaryComponent = () => {
           >
             <thead>
               <tr>
-                <th>Late</th>
+                <th>Late(min)</th>
                 {/* <th>fromTime</th> */}
                 <th>User ID</th>
                 <th>Employee Name</th>
@@ -1641,12 +1621,7 @@ const SalaryComponent = () => {
             <label>Total Monthly Sunday Absent Count:</label>
             <strong>{sundayAbsentCount}</strong>
           </div>
-          {/* <div>
-            <label>Total Late:</label>
-            <strong>{totalLateMinutes}</strong>
-          </div> */}
-          
-
+ 
         </div>
       </div>
       {editModalOpen && (

@@ -30,9 +30,8 @@ const EmployeeMasterComponent = () => {
   const [cancelButtonClicked, setCancelButtonClicked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [fromTime, setFromTime] = useState(new Date());  // Provide a default value
-const [toTime, setToTime] = useState(new Date());  // Provide a default value
-
+  const [fromTime, setFromTime] = useState(new Date()); // Provide a default value
+  const [toTime, setToTime] = useState(new Date()); // Provide a default value
 
   const handleAddOne = () => {
     // Disable and enable buttons as needed
@@ -99,11 +98,21 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
         ...employeeDetails,
         Date_Of_Joining: formattedDate,
         From_Time: fromTime
-        ? fromTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        : null,
-      To_Time: toTime
-        ? toTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        : null,
+          ? fromTime.toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          : null,
+        To_Time: toTime
+          ? toTime.toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          : null,
       };
 
       // Send the employee details to the backend API for update
@@ -141,11 +150,21 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
         ...employeeDetails,
         Date_Of_Joining: formattedDate,
         From_Time: fromTime
-        ? fromTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        : null,
-      To_Time: toTime
-        ? toTime.toLocaleTimeString("en-US", { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })
-        : null,
+          ? fromTime.toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          : null,
+        To_Time: toTime
+          ? toTime.toLocaleTimeString("en-US", {
+              hour12: false,
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            })
+          : null,
       };
 
       // Send the employee details to the backend API for insertion
@@ -223,7 +242,7 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
       .then((response) => {
         // Assuming the response contains the last record data
         const lastRecord = response.data.lastUserCreation;
-      
+
         // Set the values from the last record to the state
         setEmployeeDetails({
           Employee_Code: lastRecord.Employee_Code,
@@ -233,10 +252,16 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
           Date_Of_Joining: lastRecord.Date_Of_Joining,
           Resigned: lastRecord.Resigned,
         });
-        setFromTime(lastRecord.From_Time ? new Date(`2024-01-01 ${lastRecord.From_Time}`) : null);
-        setToTime(lastRecord.To_Time ? new Date(`2024-01-01 ${lastRecord.To_Time}`) : null);
-        
-
+        setFromTime(
+          lastRecord.From_Time
+            ? new Date(`2024-01-01 ${lastRecord.From_Time}`)
+            : null
+        );
+        setToTime(
+          lastRecord.To_Time
+            ? new Date(`2024-01-01 ${lastRecord.To_Time}`)
+            : null
+        );
       })
       .catch((error) => {
         console.error("Error fetching last record:", error);
@@ -351,9 +376,8 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
   };
 
   const handleFromTimeChange = (time) => {
-    console.log("time is",time)
+    console.log("time is", time);
     setFromTime(time);
- 
   };
 
   const handleToTimeChange = (time) => {
@@ -364,7 +388,9 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
     e.preventDefault();
     console.log("Employee details submitted:", {
       ...employeeDetails,
-      From_Time: fromTime ? fromTime.toLocaleTimeString("en-US", { hour12: false }) : null,
+      From_Time: fromTime
+        ? fromTime.toLocaleTimeString("en-US", { hour12: false })
+        : null,
       To_Time: toTime ? toTime.toLocaleTimeString() : null,
     });
   };
@@ -384,18 +410,23 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
   const location = useLocation();
   const editRecordData = location.state && location.state.editRecordData;
 
-
-  console.log("editRecordData",editRecordData)
-
-  
+  console.log("editRecordData", editRecordData);
 
   useEffect(() => {
     if (editRecordData) {
       setEmployeeDetails({
         ...editRecordData,
       });
-      setFromTime(editRecordData.From_Time ? new Date(`2024-01-01 ${editRecordData.From_Time}`) : null);
-      setToTime(editRecordData.To_Time ? new Date(`2024-01-01 ${editRecordData.To_Time}`) : null);
+      setFromTime(
+        editRecordData.From_Time
+          ? new Date(`2024-01-01 ${editRecordData.From_Time}`)
+          : null
+      );
+      setToTime(
+        editRecordData.To_Time
+          ? new Date(`2024-01-01 ${editRecordData.To_Time}`)
+          : null
+      );
       setAddOneButtonEnabled(true);
       setEditButtonEnabled(true);
       setDeleteButtonEnabled(true);
@@ -407,6 +438,116 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
       handleAddOne();
     }
   }, [editRecordData]);
+
+  const [currentRecordIndex, setCurrentRecordIndex] = useState(0);
+  const [records, setRecords] = useState([]);
+
+  const fetchFirstRecord = () => {
+    axios
+      .get(`${apiURL}/api/employees/getfirstnavigationemployee`)
+      .then((response) => {
+        const firstRecord = response.data.firstUserCreation;
+        setEmployeeDetails(firstRecord);
+        setRecords([firstRecord]);
+        setFromTime([firstRecord].From_Time);
+        setCurrentRecordIndex(0);
+        setFromTime(
+          firstRecord.From_Time
+            ? new Date(`2024-01-01 ${firstRecord.From_Time}`)
+            : null
+        );
+        setToTime(
+          firstRecord.To_Time
+            ? new Date(`2024-01-01 ${firstRecord.To_Time}`)
+            : null
+        );
+      });
+  };
+
+  const fetchLastRecord = () => {
+    axios
+      .get(`${apiURL}/api/employees/getlastnavigationemployee`)
+      .then((response) => {
+        const lastRecord = response.data.lastUserCreation;
+        setEmployeeDetails(lastRecord);
+        setRecords([lastRecord]);
+        setCurrentRecordIndex(0);
+        setFromTime(
+          lastRecord.From_Time
+            ? new Date(`2024-01-01 ${lastRecord.From_Time}`)
+            : null
+        );
+        setToTime(
+          lastRecord.To_Time
+            ? new Date(`2024-01-01 ${lastRecord.To_Time}`)
+            : null
+        );
+      });
+  };
+
+  const fetchPreviousRecord = async () => {
+    // const currentEmployeeCode = records[currentRecordIndex].employeeCode;
+    const response = await axios.get(
+      `${apiURL}/api/employees/getpreviousnavigationemployee/${employeeDetails.Employee_Code}`
+    );
+
+    if (response.data.previousUserCreation) {
+      const previousRecord = response.data.previousUserCreation;
+      setEmployeeDetails(previousRecord);
+      setCurrentRecordIndex(currentRecordIndex - 1);
+      setFromTime(
+        previousRecord.From_Time
+          ? new Date(`2024-01-01 ${previousRecord.From_Time}`)
+          : null
+      );
+      setToTime(
+        previousRecord.To_Time
+          ? new Date(`2024-01-01 ${previousRecord.To_Time}`)
+          : null
+      );
+    } else {
+      console.log("No previous record available.");
+    }
+  };
+
+  const fetchNextRecord = async () => {
+    // const currentEmployeeCode = records[currentRecordIndex].employeeCode;
+    const response = await axios.get(
+      `${apiURL}/api/employees/getnextnavigationemployee/${employeeDetails.Employee_Code}`
+    );
+
+    if (response.data.nextUserCreation) {
+      const nextRecord = response.data.nextUserCreation;
+      setEmployeeDetails(nextRecord);
+      setCurrentRecordIndex(currentRecordIndex + 1);
+      setFromTime(
+        nextRecord.From_Time
+          ? new Date(`2024-01-01 ${nextRecord.From_Time}`)
+          : null
+      );
+      setToTime(
+        nextRecord.To_Time ? new Date(`2024-01-01 ${nextRecord.To_Time}`) : null
+      );
+    } else {
+      console.log("No next record available.");
+    }
+  };
+
+  const handleFirst = () => {
+    fetchFirstRecord();
+  };
+
+  const handleLast = () => {
+    fetchLastRecord();
+  };
+
+  const handlePrevious = () => {
+    fetchPreviousRecord();
+  };
+
+  const handleNext = () => {
+    fetchNextRecord();
+  };
 
   return (
     <>
@@ -538,6 +679,76 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
           >
             Back
           </button>
+
+
+          <div style={{ display:"flex", justifyContent: "space-between", marginLeft: "100px" }}>
+
+          <button
+            onClick={handleFirst}
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              width: "200px",
+              height: "35px",
+              fontSize: "12px",
+             
+              
+            }}
+          >
+            &lt;&lt; 
+          </button>
+          <button
+            onClick={handlePrevious}
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              width: "100%",
+              height: "35px",
+              fontSize: "12px",
+              marginLeft:"5px"
+            }}
+          >
+            &lt; 
+          </button>
+          <button
+            onClick={handleNext}
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              width: "100%",
+              height: "35px",
+              fontSize: "12px",
+              marginLeft:"5px"
+            }}
+          >
+             &gt;
+          </button>
+          <button
+            onClick={handleLast}
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              width: "100%",
+              height: "35px",
+              fontSize: "12px",
+              marginLeft:"5px"
+            }}
+          >
+            &gt;&gt; 
+          </button>
+          </div>
+
+
+
+
         </div>
       </div>
       <br></br>
@@ -684,7 +895,6 @@ const [toTime, setToTime] = useState(new Date());  // Provide a default value
             </div>
 
             <div></div>
-     
           </form>
         </div>
       </div>

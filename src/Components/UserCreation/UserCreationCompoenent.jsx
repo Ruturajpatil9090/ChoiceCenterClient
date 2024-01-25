@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
-
 var employeeCodeNew = "";
 
 const UserCreationCompoenent = () => {
@@ -38,6 +37,8 @@ const UserCreationCompoenent = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [lastEmployeeCode, setLastEmployeeCode] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const [employeeDetails, setEmployeeDetails] = useState({
     employeeCode: "",
     userName: "",
@@ -55,8 +56,6 @@ const UserCreationCompoenent = () => {
       [name]: value,
     });
   };
-
-  
 
   const handleAddOne = () => {
     // Disable and enable buttons as needed
@@ -89,6 +88,7 @@ const UserCreationCompoenent = () => {
           password: "",
           userType: "U",
         });
+        setCurrentIndex(response.data.length - 1);
       })
       .catch((error) => {
         console.error("Error fetching last employee code:", error);
@@ -112,7 +112,6 @@ const UserCreationCompoenent = () => {
 
   const handleSaveOrUpdate = () => {
     if (isEditMode) {
-      // Update existing user
       axios
         .put(
           `${apiURL}/api/employees/updateuser/${employeeCodeNew}`,
@@ -134,12 +133,8 @@ const UserCreationCompoenent = () => {
           console.error("Error updating data:", error);
         });
     } else {
-      // Insert new user
       axios
-        .post(
-          `${apiURL}/api/employees/insertnewuser`,
-          employeeDetails
-        )
+        .post(`${apiURL}/api/employees/insertnewuser`, employeeDetails)
         .then((response) => {
           console.log("Data saved successfully:", response.data);
           window.alert("Data saved successfully!");
@@ -174,12 +169,10 @@ const UserCreationCompoenent = () => {
     setSaveButtonEnabled(false);
     setCancelButtonEnabled(false);
     axios
-      .delete(
-        `${apiURL}/api/employees/deleteuser/${employeeCodeNew}`
-      )
+      .delete(`${apiURL}/api/employees/deleteuser/${employeeDetails.employeeCode}`)
       .then((response) => {
         console.log("User deleted successfully:", response.data);
-        // Reset the form after successful deletion
+        window.alert("User deleted successfully")
         setEmployeeDetails({
           employeeCode: "",
           userName: "",
@@ -265,6 +258,73 @@ const UserCreationCompoenent = () => {
       handleAddOne();
     }
   }, [editRecordData]);
+
+  const [currentRecordIndex, setCurrentRecordIndex] = useState(0);
+  const [records, setRecords] = useState([]);
+
+  const fetchFirstRecord = () => {
+    axios.get(`${apiURL}/api/employees/getfirstnavigation`).then((response) => {
+      const firstRecord = response.data.firstUserCreation;
+      setEmployeeDetails(firstRecord);
+      setRecords([firstRecord]);
+      setCurrentRecordIndex(0);
+    });
+  };
+
+  const fetchLastRecord = () => {
+    axios.get(`${apiURL}/api/employees/getlastnavigation`).then((response) => {
+      const lastRecord = response.data.lastUserCreation;
+      setEmployeeDetails(lastRecord);
+      setRecords([lastRecord]);
+      setCurrentRecordIndex(0);
+    });
+  };
+
+  const fetchPreviousRecord = async () => {
+    // const currentEmployeeCode = records[currentRecordIndex].employeeCode;
+    const response = await axios.get(
+      `${apiURL}/api/employees/getpreviousnavigation/${employeeDetails.employeeCode}`
+    );
+
+    if (response.data.previousUserCreation) {
+      const previousRecord = response.data.previousUserCreation;
+      setEmployeeDetails(previousRecord);
+      setCurrentRecordIndex(currentRecordIndex - 1);
+    } else {
+      console.log("No previous record available.");
+    }
+  };
+
+  const fetchNextRecord = async () => {
+    // const currentEmployeeCode = records[currentRecordIndex].employeeCode;
+    const response = await axios.get(
+      `${apiURL}/api/employees/getnextnavigation/${employeeDetails.employeeCode}`
+    );
+
+    if (response.data.nextUserCreation) {
+      const nextRecord = response.data.nextUserCreation;
+      setEmployeeDetails(nextRecord);
+      setCurrentRecordIndex(currentRecordIndex + 1);
+    } else {
+      console.log("No next record available.");
+    }
+  };
+
+  const handleFirst = () => {
+    fetchFirstRecord();
+  };
+
+  const handleLast = () => {
+    fetchLastRecord();
+  };
+
+  const handlePrevious = () => {
+    fetchPreviousRecord();
+  };
+
+  const handleNext = () => {
+    fetchNextRecord();
+  };
 
   return (
     <>
@@ -396,6 +456,77 @@ const UserCreationCompoenent = () => {
           >
             Back
           </button>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginLeft: "100px",
+            }}
+          >
+            <button
+              onClick={handleFirst}
+              
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "200px",
+                height: "35px",
+                fontSize: "12px",
+              }}
+             
+            >
+              &lt;&lt;
+            </button>
+            <button
+              onClick={handlePrevious}
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "100%",
+                height: "35px",
+                fontSize: "12px",
+                marginLeft: "5px",
+              }}
+             
+            >
+              &lt;
+            </button>
+            <button
+              onClick={handleNext}
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "100%",
+                height: "35px",
+                fontSize: "12px",
+                marginLeft: "5px",
+              }}
+            >
+              &gt;
+            </button>
+            <button
+              onClick={handleLast}
+              style={{
+                backgroundColor: "blue",
+                color: "white",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                width: "100%",
+                height: "35px",
+                fontSize: "12px",
+                marginLeft: "5px",
+              }}
+            >
+              &gt;&gt;
+            </button>
+          </div>
         </div>
       </div>
 
@@ -480,6 +611,7 @@ const UserCreationCompoenent = () => {
                   value={employeeDetails.mobileNo}
                   onChange={handleInputChange}
                   autoComplete="off"
+                  maxLength="10"
                   disabled={!isEditing}
                 />
               </div>

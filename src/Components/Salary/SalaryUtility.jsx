@@ -35,18 +35,19 @@ function TenderPurchaseUtility() {
     const filtered = fetchedData
       ? fetchedData.filter((post) => {
           const searchTermLower = searchTerm.toLowerCase();
-          const userIdLower = post.userId.toString();
-
+          const employeeNameLower = post.Employee_name.toLowerCase();
+  
           return (
             (filterValue === "" || post.group_Type === filterValue) &&
-            userIdLower.includes(searchTermLower)
+            employeeNameLower.includes(searchTermLower)
           );
         })
       : [];
-
+  
     setFilteredData(filtered);
     setCurrentPage(1);
   }, [searchTerm, filterValue, fetchedData]);
+  
 
   const handleSearchTermChange = (event) => {
     const term = event.target.value;
@@ -71,12 +72,14 @@ function TenderPurchaseUtility() {
   const handlePrint = () => {
     // Create a new jsPDF instance
     const pdf = new jsPDF();
-
+  
+    // Get the first record in filteredData (assuming it is not empty)
+    const firstRecord = filteredData.length > 0 ? filteredData[0] : null;
+  
     // Add custom header
-    pdf.text("CompanyName: Choice Centre in Mahadwar Road, Kolhapur.", 14, 10);
-    pdf.text(`UserId: ${fetchedData[0]?.userId}`, 14, 20);
-    pdf.text(`Employee Name: ${fetchedData[0]?.Employee_name}`, 14, 30);
-
+    pdf.text(`UserId: ${firstRecord?.userId}`, 14, 20);
+    pdf.text(`Employee Name: ${firstRecord?.Employee_name}`, 14, 30);
+  
     // Add table headers
     const headers = [
       "salary_no",
@@ -87,7 +90,7 @@ function TenderPurchaseUtility() {
       "netRatePerHour",
       "totalMonthlySalary",
     ];
-
+  
     // Add data to the table
     const data = filteredData.map((post) => [
       post.salary_no,
@@ -98,18 +101,18 @@ function TenderPurchaseUtility() {
       post.netRatePerHour,
       post.totalMonthlySalary,
     ]);
-
+  
     // Add the table to the PDF
     pdf.autoTable({
       startY: 40, // Adjust the starting Y position for the table
       head: [headers],
       body: data,
     });
-
+  
     // Save the PDF
     pdf.save("filtered_data.pdf");
   };
-
+  
   const handleBackButton = () => {
     navigate("/home");
   };

@@ -82,6 +82,7 @@ const Home = () => {
       <Form.Label className="animate-charcter">Choice Center</Form.Label>
       <br></br>
       <div className="button-container">
+      {userType === "A" && (
         <Button
           variant="primary"
           className="button "
@@ -95,6 +96,7 @@ const Home = () => {
           />
           Employee Master
         </Button>
+   )}
 
         <Button
           variant="success"
