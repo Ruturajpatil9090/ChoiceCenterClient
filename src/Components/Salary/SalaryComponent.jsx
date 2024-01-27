@@ -622,7 +622,7 @@ const SalaryComponent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+    
     setSalaryDetails({
       ...salaryDetails,
       [name]: value,

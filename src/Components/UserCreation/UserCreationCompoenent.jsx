@@ -51,11 +51,19 @@ const UserCreationCompoenent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+  
+    // Check if the entered value is a valid integer for the mobile number
+    if (name === "mobileNo" && !/^\d*$/.test(value)) {
+      // If not a valid integer, don't update the state
+      return;
+    }
+  
     setEmployeeDetails({
       ...employeeDetails,
       [name]: value,
     });
   };
+  
 
   const handleAddOne = () => {
     // Disable and enable buttons as needed

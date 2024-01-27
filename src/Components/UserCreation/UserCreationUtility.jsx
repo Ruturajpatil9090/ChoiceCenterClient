@@ -49,6 +49,7 @@ function UserCreationUtility() {
 
   const handleSearchTermChange = (event) => {
     const term = event.target.value;
+    
     setSearchTerm(term);
   };
 
