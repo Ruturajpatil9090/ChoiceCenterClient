@@ -138,6 +138,7 @@ const UserCreationCompoenent = () => {
         .then((response) => {
           console.log("Data saved successfully:", response.data);
           window.alert("Data saved successfully!");
+          handleAddOne();
           setIsEditMode(false);
           setAddOneButtonEnabled(true);
           setEditButtonEnabled(true);

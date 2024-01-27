@@ -173,6 +173,7 @@ const EmployeeMasterComponent = () => {
         .then((response) => {
           // console.log("Employee saved:", response.data);
           window.alert("Data saved successfully!");
+          handleAddOne();
           setEmployeeDetails({
             Employee_Code: "",
             Employee_Name: "",
