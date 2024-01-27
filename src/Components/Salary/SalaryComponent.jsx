@@ -69,7 +69,7 @@ const SalaryComponent = () => {
     setEditButtonEnabled(false);
     setDeleteButtonEnabled(false);
     setIsEditMode(false);
-
+  
     setFilteredData([]);
     // Reset totalMonthlySalary and totalHours
     setTotalMonthlySalary("0.00");
@@ -350,34 +350,20 @@ const SalaryComponent = () => {
     }
   };
 
-  //functionality of all feilds in Head section
   const handleDateChange = (e) => {
-    const newDate = new Date(e.target.value);
-    setSelectedDate(newDate);
+    const inputValue = e.target.value;
+    const newDate = new Date(inputValue);
+
+    // Check if the input value is a valid date
+    if (!isNaN(newDate.getTime())) {
+      setSelectedDate(newDate);
+    } else {
+      // Handle invalid date input (you can show an error message or handle it in a way suitable for your app)
+      console.error('Invalid date input');
+    }
   };
 
-//show the last month date on selct date logic
-
-  const getDefaultDate = () => {
-    // Get the current date
-    const currentDate = new Date();
   
-    // Set the date to the first day of the current month
-    currentDate.setDate(1);
-  
-    // Set the month to the previous month
-    currentDate.setMonth(currentDate.getMonth() - 1);
-  
-    // Format the date as "yyyy-mm-dd"
-    const formattedDate = currentDate.toISOString().slice(0, 10);
-  
-    return formattedDate;
-  };
-  
-
-
-
-
   useEffect(() => {
     // Update the date to be the first day of the previous month when the component mounts
     if (!isCancelButtonClicked) {
@@ -453,8 +439,8 @@ const SalaryComponent = () => {
         "Day",
         "Date",
         "D/HRS",
-        "RT/HRS",
-        "PSL/D",
+        "R/HRS",
+        "PDS",
         "Deduction",
         ...Array.from({ length: maxLogTimes }, (_, idx) => [
           `In ${idx + 1}`,
@@ -505,24 +491,24 @@ const SalaryComponent = () => {
       // Add summary information
       pdf.setFontSize(10);
       pdf.text(
-        `\u2022 Total Monthly Hours: ${totalHours} Hr`,
+        `\u2022 Total Monthly Working Hours= ${totalHours} Hr`,
         15,
         pdf.autoTable.previous.finalY + 10
       );
       pdf.text(
-        `\u2022 Total Sunday Deduction On Month: ${totalSundayDeduction}`,
+        `\u2022 Total Sunday Deduction= ${totalSundayDeduction}`,
         15,
         pdf.autoTable.previous.finalY + 15
       );
       // Add "Total Monthly Salary" on the right side
 
       pdf.text(
-        `\u2022 MonthlyOff Days: ${totalAbsentDays}`,
+        `\u2022 Total monthly Leave's = ${totalAbsentDays}`,
         15,
         pdf.autoTable.previous.finalY + 20
       );
       pdf.text(
-        `\u2022 Total Sunday's Count in MonthlyOff: ${sundayAbsentCount}`,
+        `\u2022 Total Monthly Sunday Leave's = ${sundayAbsentCount}`,
         15,
         pdf.autoTable.previous.finalY + 25
       );
@@ -1318,7 +1304,7 @@ const SalaryComponent = () => {
       // Employee is late
       const timeDifferenceInMinutes = (actual - expected) / (60 * 1000);
       const remainingLateMinutes = Math.max(0, timeDifferenceInMinutes - gracePeriodInMinutes);
-  
+  debugger;
       // Update cumulative late time
       totalLateMinutes += remainingLateMinutes;
   
@@ -1385,7 +1371,7 @@ const SalaryComponent = () => {
             type="date"
             className="form-control"
             onChange={handleDateChange}
-            value={getDefaultDate()}
+            value={selectedDate.toISOString().slice(0, 10)}
             disabled={isCancelButtonClicked && !isaddButtonClicked}
           />
         </div>
@@ -1710,26 +1696,26 @@ const SalaryComponent = () => {
           </table>
 
           <div>
-            <label>Total monthly Hours:</label> <strong>{totalHours}</strong>
+            <label>Total Monthly Working Hours=</label> <strong>{totalHours}</strong>
           </div>
 
           <div>
-            <label>Total Deduction on month:</label>
+            <label>Total Sunday Deduction=</label>
             <strong>{totalSundayDeduction}</strong>
           </div>
 
           <div>
-            <label>Total Monthly Salary (Rs):</label>
-            <strong>{totalMonthlySalary}</strong>
+            <label>Total Monthly Salary =</label>
+            <strong>{totalMonthlySalary}(₹)</strong>
           </div>
 
           <div>
-            <label>Total Monthly Absent Count:</label>
+            <label>Total monthly Leave's=</label>
             <strong>{totalAbsentDays}</strong>
           </div>
 
           <div>
-            <label>Total Monthly Sunday Absent Count:</label>
+            <label>Total Monthly Sunday Leave's=</label>
             <strong>{sundayAbsentCount}</strong>
           </div>
           {/* <div>
