@@ -146,7 +146,7 @@ const UserCreationCompoenent = () => {
         .then((response) => {
           console.log("Data saved successfully:", response.data);
           window.alert("Data saved successfully!");
-          handleAddOne();
+          window.location.reload();
           setIsEditMode(false);
           setAddOneButtonEnabled(true);
           setEditButtonEnabled(true);
@@ -182,14 +182,8 @@ const UserCreationCompoenent = () => {
       .then((response) => {
         console.log("User deleted successfully:", response.data);
         window.alert("User deleted successfully")
-        setEmployeeDetails({
-          employeeCode: "",
-          userName: "",
-          mobileNo: "",
-          emailId: "",
-          password: "",
-          userType: "U",
-        });
+        // window.location.reload();
+        handleCancel()
       })
       .catch((error) => {
         console.error("Error during API call:", error);
@@ -477,7 +471,7 @@ const UserCreationCompoenent = () => {
               onClick={handleFirst}
               
               style={{
-                backgroundColor: "blue",
+                backgroundColor:"blue",
                 color: "white",
                 border: "1px solid #ccc",
                 cursor: "pointer",

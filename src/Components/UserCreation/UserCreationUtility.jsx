@@ -22,7 +22,7 @@ function UserCreationUtility() {
         const apiUrl = `${apiURL}/api/employees/getallusers`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        console.log("data is",data)
+        // console.log("data is",data)
         setFetchedData(data);
       } catch (error) {
         console.error("Error fetching data:", error);

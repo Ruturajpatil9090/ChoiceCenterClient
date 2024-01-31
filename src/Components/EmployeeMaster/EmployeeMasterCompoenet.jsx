@@ -10,7 +10,7 @@ var From_Time = "";
 var To_Time = "";
 
 const EmployeeMasterComponent = () => {
-  console.log("from time values", From_Time, To_Time);
+  // console.log("from time values", From_Time, To_Time);
   const apiURL = process.env.REACT_APP_API_URL;
   const [lastEmployeeCode, setLastEmployeeCode] = useState("");
   const addNewButtonRef = useRef(null);
@@ -203,16 +203,9 @@ const EmployeeMasterComponent = () => {
           `${apiURL}/api/employees/deleteemployee/${employeeDetails.Employee_Code}`
         )
         .then((response) => {
-          console.log("Employee deleted:", response.data);
+          // console.log("Employee deleted:", response.data);
           // Optionally, perform other actions after a successful delete
-          setEmployeeDetails({
-            Employee_Code: "",
-            Employee_Name: "",
-            Basic_Salary: "",
-            Rate_Per_Hour: "",
-            Date_Of_Joining: getCurrentDate(),
-            Resigned: "N",
-          });
+          handleCancel()
           setAddOneButtonEnabled(true);
           setEditButtonEnabled(true);
           setDeleteButtonEnabled(true);
@@ -377,7 +370,7 @@ const EmployeeMasterComponent = () => {
   };
 
   const handleFromTimeChange = (time) => {
-    console.log("time is", time);
+    // console.log("time is", time);
     setFromTime(time);
   };
 
@@ -411,7 +404,7 @@ const EmployeeMasterComponent = () => {
   const location = useLocation();
   const editRecordData = location.state && location.state.editRecordData;
 
-  console.log("editRecordData", editRecordData);
+  // console.log("editRecordData", editRecordData);
 
   useEffect(() => {
     if (editRecordData) {

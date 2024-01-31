@@ -14,6 +14,9 @@ function TenderPurchaseUtility() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filterValue, setFilterValue] = useState("");
   const navigate = useNavigate();
+  const userType = localStorage.getItem("userType");
+
+  // console.log('userType',userType)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,7 +24,7 @@ function TenderPurchaseUtility() {
         const apiUrl = `${apiURL}/api/employees/getAllUtility`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        console.log("data is", data);
+        // console.log("data is", data);
         setFetchedData(data.salaryNoData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -32,6 +35,7 @@ function TenderPurchaseUtility() {
   }, []);
 
   useEffect(() => {
+   
     const filtered = fetchedData
       ? fetchedData.filter((post) => {
           const searchTermLower = searchTerm.toLowerCase();
@@ -88,7 +92,7 @@ function TenderPurchaseUtility() {
       "userId",
       "Employee Name",
       "netRatePerHour",
-      "totalMonthlySalary",
+      ...(userType === "A" ? ["TotalMonthlySalary"] : [])
     ];
   
     // Add data to the table
@@ -179,7 +183,7 @@ function TenderPurchaseUtility() {
             <th>Employee Name</th>
             <th>Days In Month</th>
             <th>NetRatePerHour</th>
-            <th>TotalMonthlySalary</th>
+            {userType === 'A' ?<th>TotalMonthlySalary (₹) </th>: ""}
           </tr>
         </thead>
         <tbody>
@@ -197,7 +201,8 @@ function TenderPurchaseUtility() {
               <td>{post.Employee_name}</td>
               <td>{post.daysInMonth}</td>
               <td>{post.netRatePerHour}</td>
-              <td>{post.totalMonthlySalary}</td>
+              {userType === 'A' ?<th>{post.totalMonthlySalary} (₹)</th>:""}
+             
             </tr>
           ))}
         </tbody>
